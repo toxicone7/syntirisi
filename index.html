@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Συντήρηση App</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1923">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+:root{
+  --bg:#0f1923;--surface:#162030;--surface2:#1e2d3d;--border:#2a3f54;
+  --accent:#00c2ff;--accent2:#ff6b35;--text:#e8f0f7;--muted:#6a8099;
+  --ok:#00e676;--ok-dim:#00e67618;--ok-border:#00e67635;--err:#ff4757;--r:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.active{display:flex}
+
+/* HEADER */
+.hdr{background:var(--surface);border-bottom:1px solid var(--border);padding:13px 15px;display:flex;align-items:center;gap:11px;position:sticky;top:0;z-index:100}
+.back{width:40px;height:40px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--accent);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.back:active{transform:scale(.88)}
+.htitle{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hsub{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-top:2px}
+
+/* SCREEN 1 */
+#s1{align-items:center;justify-content:center;gap:26px;padding:30px 18px;
+  background:radial-gradient(ellipse at 25% 20%,#1a3a5c33 0%,transparent 55%),var(--bg)}
+.logo{text-align:center}
+.logo-icon{width:66px;height:66px;background:linear-gradient(135deg,var(--accent),#0077aa);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 13px;box-shadow:0 0 40px #00c2ff33}
+.logo-title{font-size:23px;font-weight:700;letter-spacing:-.5px}
+.logo-sub{font-size:11px;color:var(--muted);margin-top:4px;font-family:'IBM Plex Mono',monospace}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;width:100%;max-width:450px}
+.card h2{font-size:15px;font-weight:600;margin-bottom:5px}
+.card p{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:100px;font-size:11px;font-family:'IBM Plex Mono',monospace;margin-bottom:13px}
+.pill-ok{background:#00e67611;color:var(--ok);border:1px solid #00e67633}
+.pill-no{background:#ff475711;color:var(--err);border:1px solid #ff475733}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.btn{width:100%;padding:14px;border:none;border-radius:10px;font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.btn-p{background:linear-gradient(135deg,var(--accent),#0099cc);color:#fff}
+.btn-o{background:transparent;border:1px solid var(--border);color:var(--text);font-size:13px;padding:12px;margin-top:9px}
+.btn-save{background:linear-gradient(135deg,var(--accent2),#e05525);color:#fff;font-size:15px;font-weight:700;padding:17px;border-radius:12px;box-shadow:0 4px 20px #ff6b3544}
+.divider{display:flex;align-items:center;gap:10px;margin:15px 0}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.divider span{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace}
+
+/* SCREEN 2 */
+#s2{background:var(--bg)}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:9px 13px;display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.chip{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 9px;font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--muted)}
+.chip b{color:var(--accent)}
+.chip-ok b{color:var(--ok)}
+.srch-wrap{padding:9px 13px;background:var(--surface);border-bottom:1px solid var(--border)}
+.srch{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+.srch:focus{border-color:var(--accent)}
+.srch::placeholder{color:var(--muted)}
+.rlist{flex:1;overflow-y:auto;padding:9px 11px;display:flex;flex-direction:column;gap:7px}
+
+/* Record card — normal */
+.rc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:13px 42px 13px 13px;cursor:pointer;transition:all .15s;position:relative}
+.rc:active{background:var(--surface2);transform:scale(.985)}
+/* Record card — saved/done */
+.rc.saved{background:var(--ok-dim);border-color:var(--ok-border)}
+.rc.saved:active{background:#00e67625}
+
+.rc-r1{display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap}
+.rc-id{font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 6px}
+.rc-type{font-size:10px;color:var(--accent);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.8px}
+.badge-saved{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--ok);background:#00e67618;border:1px solid #00e67640;border-radius:20px;padding:2px 8px;margin-left:auto}
+.rc-addr{font-size:15px;font-weight:600;margin-bottom:4px}
+.rc-ep{font-size:12px;color:var(--muted);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tags{display:flex;gap:5px;flex-wrap:wrap}
+.tag{font-size:11px;padding:2px 7px;border-radius:4px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.rc-note{margin-top:5px;font-size:11px;color:var(--muted);font-style:italic;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.rc-saved-info{margin-top:7px;font-size:11px;color:var(--ok);display:flex;align-items:center;gap:5px}
+.rc-arr{position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:20px}
+
+/* SCREEN 3 */
+#s3{background:var(--bg)}
+.igrid{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 13px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.igl{font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.7px}
+.igv{font-size:13px;font-weight:600;margin-top:2px}
+.ig-full{grid-column:1/-1}
+.prog-wrap{padding:10px 13px;background:var(--surface);border-bottom:1px solid var(--border)}
+.prog-lbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px}
+.prog-track{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--ok));border-radius:3px;transition:width .3s}
+.clist{flex:1;overflow-y:auto;padding:9px 11px;display:flex;flex-direction:column;gap:5px}
+.ci{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .2s}
+.ci.chk{border-color:#00e67633;background:#00e67605}
+.ci-top{display:flex;align-items:flex-start;gap:11px;padding:12px;cursor:pointer}
+.cbox{width:26px;height:26px;min-width:26px;border-radius:7px;border:2px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:14px;color:transparent;transition:all .15s;margin-top:1px}
+.ci.chk .cbox{background:var(--ok);border-color:var(--ok);color:#000;font-weight:700}
+.ci-body{flex:1;min-width:0}
+.ci-id{font-size:10px;color:var(--accent2);font-family:'IBM Plex Mono',monospace;font-weight:600;margin-bottom:3px}
+.ci-name{font-size:14px;font-weight:600;margin-bottom:3px}
+.ci-log{font-size:12px;color:var(--muted);line-height:1.4}
+.ci.chk .ci-name,.ci.chk .ci-log{opacity:.45;text-decoration:line-through;text-decoration-color:var(--muted)}
+.ci-cmt-wrap{padding:0 12px 12px}
+.cmt{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:13px;outline:none;resize:none;min-height:52px;transition:border-color .2s;display:block}
+.cmt:focus{border-color:var(--accent)}
+.cmt::placeholder{color:var(--muted)}
+.save-bar{padding:13px;background:var(--surface);border-top:1px solid var(--border);display:flex;flex-direction:column;gap:7px}
+.save-sum{font-size:12px;color:var(--muted);text-align:center;font-family:'IBM Plex Mono',monospace}
+.save-sum b{color:var(--accent2)}
+
+/* SCREEN 4 — HISTORY */
+#s4{background:var(--bg)}
+.hist-scroll{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:10px}
+
+.hist-header{background:var(--ok-dim);border:1px solid var(--ok-border);border-radius:var(--r);padding:14px}
+.hist-header-title{font-size:16px;font-weight:700;margin-bottom:3px}
+.hist-header-meta{font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace}
+
+.hist-entry{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.hist-entry-hdr{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--surface2)}
+.hist-entry-date{font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--accent)}
+.hist-entry-count{font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted)}
+.hist-rows{padding:10px 14px;display:flex;flex-direction:column;gap:8px}
+.hist-row{border-left:2px solid var(--accent2);padding-left:10px}
+.hist-row-id{font-size:10px;color:var(--accent2);font-family:'IBM Plex Mono',monospace;font-weight:600}
+.hist-row-name{font-size:13px;font-weight:600;margin:2px 0}
+.hist-row-log{font-size:12px;color:var(--muted)}
+.hist-row-cmt{font-size:12px;color:var(--text);margin-top:3px;font-style:italic}
+
+.hist-empty{text-align:center;padding:30px 20px;color:var(--muted);font-size:13px}
+
+.btn-danger{background:transparent;border:1px solid #ff475755;color:var(--err);font-size:13px;padding:10px;margin-top:4px}
+
+/* MODAL */
+.mbg{display:none;position:fixed;inset:0;background:#00000099;z-index:500;align-items:center;justify-content:center;padding:18px}
+.mbg.show{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px 20px;width:100%;max-width:370px;text-align:center}
+.modal h3{font-size:17px;margin-bottom:8px}
+.modal p{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:20px}
+.mbtns{display:flex;flex-direction:column;gap:8px}
+
+/* EMPTY/SPINNER */
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;padding:40px;color:var(--muted);text-align:center}
+.empty .ei{font-size:42px;opacity:.3}
+.empty h3{font-size:15px;color:var(--text)}
+.empty p{font-size:13px;line-height:1.5}
+.spin{width:30px;height:30px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(65px);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:13px;font-weight:500;z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;box-shadow:0 8px 28px #00000066;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.ok{border-color:#00e67644;color:var(--ok)}
+.toast.err{border-color:#ff475744;color:var(--err)}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- ══ S1: LOAD ══ -->
+<div id="s1" class="screen active">
+  <div class="logo">
+    <div class="logo-icon">🛗</div>
+    <div class="logo-title">Συντήρηση</div>
+    <div class="logo-sub">ELEVATOR MAINTENANCE TRACKER</div>
+  </div>
+  <div class="card">
+    <div id="auth-pill" class="pill pill-no"><div class="dot"></div> Μη συνδεδεμένο</div>
+    <h2>Φόρτωση Προγράμματος Ημέρας</h2>
+    <p>Συνδεθείτε με Google Drive και επιλέξτε το <strong>programma.xlsx</strong> της ημέρας.</p>
+    <button class="btn btn-p" id="btn-drive" onclick="signInAndPick()"><span>🔗</span> Σύνδεση Google Drive</button>
+    <div class="divider"><span>ή τοπικά</span></div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:9px">Φόρτωση αρχείου από τη συσκευή:</p>
+    <input type="file" id="lf-prog" accept=".xlsx,.xls" style="display:none">
+    <button class="btn btn-o" id="btn-local-prog">📂 Άνοιγμα τοπικού αρχείου</button>
+  </div>
+</div>
+
+<!-- ══ S2: LIST ══ -->
+<div id="s2" class="screen">
+  <div class="hdr">
+    <div style="flex:1">
+      <div class="htitle">Πρόγραμμα Συντήρησης</div>
+      <div class="hsub" id="fname">—</div>
+    </div>
+    <button class="btn btn-o" style="width:auto;padding:8px 12px;font-size:13px;margin:0" onclick="go('s1')">↩</button>
+  </div>
+  <div class="topbar">
+    <div class="chip">Σύνολο: <b id="st-tot">0</b></div>
+    <div class="chip">Εμφανίζονται: <b id="st-sh">0</b></div>
+    <div class="chip chip-ok">Ολοκληρωμένα: <b id="st-done">0</b></div>
+  </div>
+  <div class="srch-wrap">
+    <input class="srch" id="srch" type="text" placeholder="🔍  Αναζήτηση διεύθυνσης, τεχνικού, περιοχής..." oninput="filterList()">
+  </div>
+  <div class="rlist" id="rlist"><div class="empty"><div class="spin"></div><p>Φόρτωση...</p></div></div>
+</div>
+
+<!-- ══ S3: CHECKLIST ══ -->
+<div id="s3" class="screen">
+  <div class="hdr">
+    <button class="back" onclick="go('s2')">←</button>
+    <div style="flex:1;min-width:0">
+      <div class="htitle" id="cl-title">Λίστα Ελέγχου</div>
+      <div class="hsub" id="cl-sub">—</div>
+    </div>
+  </div>
+  <div class="igrid" id="igrid"></div>
+  <div class="prog-wrap">
+    <div class="prog-lbl"><span>Πρόοδος ΣΥΜΜΟΡΦΩΣΗΣ</span><span id="prog-txt">0 / 0</span></div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+  <div class="clist" id="clist"></div>
+  <div class="save-bar">
+    <div class="save-sum">Μη συμμορφωμένα (προς αποθήκευση): <b id="unc">0</b></div>
+    <button class="btn btn-save" id="btn-save" onclick="saveResults()">💾  Αποθήκευση αποτελεσμάτων</button>
+  </div>
+</div>
+
+<!-- ══ S4: HISTORY ══ -->
+<div id="s4" class="screen">
+  <div class="hdr">
+    <button class="back" onclick="go('s2')">←</button>
+    <div style="flex:1;min-width:0">
+      <div class="htitle" id="h-title">Ιστορικό</div>
+      <div class="hsub" id="h-sub">—</div>
+    </div>
+  </div>
+  <div class="hist-scroll" id="hist-scroll"></div>
+</div>
+
+<!-- MODAL: pick checklist -->
+<div class="mbg" id="cl-modal">
+  <div class="modal">
+    <h3>📋 Αρχείο Checklist</h3>
+    <p>Επιλέξτε το <strong>checklist.xlsx</strong> για να φορτωθούν οι παρατηρήσεις ελέγχου.</p>
+    <div class="mbtns">
+      <button class="btn btn-p" onclick="pickCLDrive()">🔗 Από Google Drive</button>
+      <input type="file" id="lf-cl" accept=".xlsx,.xls" style="display:none">
+      <button class="btn btn-o" style="width:100%;margin:0" id="btn-local-cl">📂 Από τη συσκευή</button>
+      <button class="btn btn-o" style="margin:0" onclick="closeMod()">Ακύρωση</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ──
+const GOOGLE_CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com';
+const SCOPES = 'https://www.googleapis.com/auth/drive';
+const LS_KEY = 'syntirisi_history'; // localStorage key
+
+// ── STATE ──
+let records=[], filtered=[], clTpl=[], clItems=[], curRec=null, token=null;
+
+// ══════════════════════════════════════
+// HISTORY (localStorage)
+// history = { [anelk_key]: { record: {...}, saves: [{date, time, unchecked:[...]}] } }
+// anelk_key = record.anelk or fallback to dieuthynsi+aa
+// ══════════════════════════════════════
+function histKey(r){ return (r.anelk||r.dieuthynsi||r.aa||'').trim(); }
+
+function loadHistory(){
+  try{ return JSON.parse(localStorage.getItem(LS_KEY)||'{}'); }
+  catch(e){ return {}; }
+}
+function saveHistory(h){ localStorage.setItem(LS_KEY, JSON.stringify(h)); }
+
+function recordSaved(r, uncheckedItems){
+  const h = loadHistory();
+  const k = histKey(r);
+  const now = new Date();
+  const entry = {
+    date: now.toLocaleDateString('el-GR'),
+    time: now.toLocaleTimeString('el-GR',{hour:'2-digit',minute:'2-digit'}),
+    unchecked: uncheckedItems.map(item=>({
+      idPar:    item.idPar,
+      onomasia: item.onomasia,
+      logidrio: item.logidrio,
+      sxolia:   item.sxolia
+    }))
+  };
+  if(!h[k]){
+    h[k] = {
+      record: { aa:r.aa, dieuthynsi:r.dieuthynsi, periochi:r.periochi, tk:r.tk,
+                typos:r.typos, anelk:r.anelk, eponymia:r.eponymia, technikos:r.technikos },
+      saves: []
+    };
+  }
+  h[k].saves.unshift(entry); // newest first
+  saveHistory(h);
+}
+
+function isRecordSaved(r){
+  const h = loadHistory();
+  return !!h[histKey(r)];
+}
+
+function getSaveCount(){
+  const h = loadHistory();
+  return Object.keys(h).length;
+}
+
+// ── GOOGLE ──
+function loadGapi(){
+  return new Promise(res=>{
+    if(window.gapi){res();return;}
+    const s=document.createElement('script');
+    s.src='https://apis.google.com/js/api.js';
+    s.onload=()=>gapi.load('auth2:picker',res);
+    document.head.appendChild(s);
+  });
+}
+async function signInAndPick(){
+  const btn=document.getElementById('btn-drive');
+  btn.disabled=true;btn.innerHTML='<div class="spin" style="width:18px;height:18px;border-width:2px"></div> Σύνδεση...';
+  try{
+    await loadGapi();
+    const auth=await gapi.auth2.init({client_id:GOOGLE_CLIENT_ID,scope:SCOPES});
+    const user=await auth.signIn();
+    token=user.getAuthResponse().access_token;
+    const p=document.getElementById('auth-pill');
+    p.className='pill pill-ok';p.innerHTML='<div class="dot"></div> Συνδεδεμένο';
+    toast('✅ Συνδέθηκε!','ok');
+    openPicker(f=>driveFile(f.id,f.name,'prog'));
+  }catch(e){toast('❌ Αποτυχία σύνδεσης','err');console.error(e);}
+  finally{btn.disabled=false;btn.innerHTML='<span>🔗</span> Σύνδεση Google Drive';}
+}
+function openPicker(cb){
+  new google.picker.PickerBuilder()
+    .addView(new google.picker.DocsView().setIncludeFolders(false)
+      .setMimeTypes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'))
+    .setOAuthToken(token)
+    .setCallback(d=>{if(d.action===google.picker.Action.PICKED)cb(d.docs[0]);})
+    .build().setVisible(true);
+}
+async function driveFile(id,name,target){
+  toast('⏳ Φόρτωση...','');
+  try{
+    const res=await fetch(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`,{headers:{Authorization:`Bearer ${token}`}});
+    const arr=await(await res.blob()).arrayBuffer();
+    target==='prog'?parseProg(arr,name):parseCL(arr);
+  }catch(e){toast('❌ Αποτυχία φόρτωσης','err');console.error(e);}
+}
+function pickCLDrive(){
+  if(!token){toast('Συνδεθείτε πρώτα','err');return;}
+  openPicker(f=>driveFile(f.id,f.name,'cl').then(()=>{closeMod();openCL();}));
+}
+
+// ── LOCAL FILES ──
+function readFileAs(file, cb){
+  try{
+    const r=new FileReader();
+    r.onerror=()=>toast('❌ Σφάλμα ανάγνωσης αρχείου','err');
+    r.onload=ev=>{
+      try{ cb(ev.target.result, file.name); }
+      catch(e){ toast('❌ Σφάλμα επεξεργασίας αρχείου','err'); console.error(e); }
+    };
+    r.readAsArrayBuffer(file);
+  }catch(e){ toast('❌ FileReader σφάλμα','err'); console.error(e); }
+}
+
+// All file input wiring is done in DOMContentLoaded — no inline handlers needed
+
+// ── PARSE PROGRAMMA.XLSX ──
+function parseProg(buf,name){
+  try{
+    const wb=XLSX.read(buf,{type:'array'});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const data=XLSX.utils.sheet_to_json(ws,{defval:''});
+    if(!data.length){toast('Κενό αρχείο','err');return;}
+    records=data.map((row,i)=>({
+      idx:i,
+      aa:           row['A/A']||'',
+      seira:        row['Σειρά']||'',
+      proeleusi:    row['Προέλευση']||'',
+      typos_pel:    row['Τύπος πελάτη']||'',
+      pelatis:      row['Πελάτης']||'',
+      eponymia:     row['Επωνυμία']||'',
+      anelk:        row['Ανελκυστήρας']||'',
+      typos:        row['Τύπος']||'',
+      dieuthynsi:   row['Διευθυνση Συντήρησης']||'',
+      periochi:     row['Περιοχή']||'',
+      tk:           row['Τκ']||'',
+      technikos:    row['Τεχνικός']||'',
+      paratiriseis: row['Παρατηρήσεις']||'',
+    }));
+    document.getElementById('fname').textContent=name;
+    document.getElementById('st-tot').textContent=records.length;
+    filtered=[...records];
+    renderList();go('s2');
+    toast(`✅ ${records.length} εγγραφές φορτώθηκαν`,'ok');
+  }catch(e){toast('❌ Σφάλμα ανάγνωσης','err');console.error(e);}
+}
+
+// ── PARSE CHECKLIST.XLSX ──
+function parseCL(buf){
+  try{
+    const wb=XLSX.read(buf,{type:'array'});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    clTpl=XLSX.utils.sheet_to_json(ws,{defval:''});
+    toast(`✅ ${clTpl.length} παρατηρήσεις φορτώθηκαν`,'ok');
+  }catch(e){toast('❌ Σφάλμα checklist','err');console.error(e);}
+}
+
+// ── RENDER LIST ──
+function renderList(){
+  const el=document.getElementById('rlist');
+  document.getElementById('st-sh').textContent=filtered.length;
+  const doneCount=records.filter(r=>isRecordSaved(r)).length;
+  document.getElementById('st-done').textContent=doneCount;
+
+  if(!filtered.length){
+    el.innerHTML=`<div class="empty"><div class="ei">🔍</div><h3>Δεν βρέθηκαν εγγραφές</h3><p>Δοκιμάστε άλλη αναζήτηση</p></div>`;
+    return;
+  }
+  el.innerHTML=filtered.map(r=>{
+    const saved=isRecordSaved(r);
+    const h=loadHistory();
+    const hData=saved?h[histKey(r)]:null;
+    const lastSave=hData?hData.saves[0]:null;
+    return `
+    <div class="rc${saved?' saved':''}" onclick="tapRec(${r.idx})">
+      <div class="rc-r1">
+        <span class="rc-id">#${esc(r.aa)}</span>
+        <span class="rc-type">${esc(r.proeleusi)} · ${esc(r.typos)}</span>
+        ${saved?`<span class="badge-saved">✓ ΑΠΟΘΗΚΕΥΤΗΚΕ</span>`:''}
+      </div>
+      <div class="rc-addr">${esc(r.dieuthynsi)||'(χωρίς διεύθυνση)'}</div>
+      ${r.eponymia?`<div class="rc-ep">${esc(r.eponymia)}</div>`:''}
+      <div class="tags">
+        ${r.periochi?`<span class="tag">📍 ${esc(r.periochi)}</span>`:''}
+        ${r.tk?`<span class="tag">📮 ${esc(r.tk)}</span>`:''}
+        ${r.technikos?`<span class="tag">👤 ${esc(r.technikos)}</span>`:''}
+        ${r.anelk?`<span class="tag">🛗 ${esc(r.anelk)}</span>`:''}
+      </div>
+      ${saved&&lastSave?`<div class="rc-saved-info">✅ Τελευταία αποθήκευση: ${lastSave.date} ${lastSave.time} · ${lastSave.unchecked.length} μη συμμ.</div>`:''}
+      ${!saved&&r.paratiriseis?`<div class="rc-note">💬 ${esc(r.paratiriseis)}</div>`:''}
+      <div class="rc-arr">›</div>
+    </div>`}).join('');
+}
+
+function filterList(){
+  const q=document.getElementById('srch').value.toLowerCase().trim();
+  filtered=q?records.filter(r=>[r.dieuthynsi,r.periochi,r.eponymia,r.technikos,r.typos,r.aa,r.anelk].join(' ').toLowerCase().includes(q)):[...records];
+  renderList();
+}
+
+// ── TAP RECORD ──
+// If saved → go to history. If not saved → go to checklist.
+function tapRec(idx){
+  curRec=records[idx];
+  if(isRecordSaved(curRec)){
+    openHistory(curRec);
+  } else {
+    clTpl.length?openCL():document.getElementById('cl-modal').classList.add('show');
+  }
+}
+
+// ── OPEN CHECKLIST ──
+function openCL(){
+  const r=curRec;
+  document.getElementById('cl-title').textContent=r.dieuthynsi||'Λίστα Ελέγχου';
+  document.getElementById('cl-sub').textContent=`${r.typos} · ${r.periochi}`;
+  document.getElementById('igrid').innerHTML=`
+    <div><div class="igl">Διεύθυνση</div><div class="igv">${esc(r.dieuthynsi)}</div></div>
+    <div><div class="igl">Περιοχή / ΤΚ</div><div class="igv">${esc(r.periochi)} ${esc(r.tk)}</div></div>
+    <div><div class="igl">Τύπος</div><div class="igv">${esc(r.typos)}</div></div>
+    <div><div class="igl">Τεχνικός</div><div class="igv">${esc(r.technikos)}</div></div>
+    <div class="ig-full"><div class="igl">Ανελκυστήρας</div><div class="igv">${esc(r.anelk)} · ${esc(r.eponymia)}</div></div>
+    ${r.paratiriseis?`<div class="ig-full"><div class="igl">Παρατηρήσεις</div><div class="igv" style="font-size:12px;font-weight:400;color:var(--muted)">${esc(r.paratiriseis)}</div></div>`:''}
+  `;
+  clItems=clTpl.map((row,i)=>({
+    id:i,
+    idPar:    row['ID ΠΑΡΑΤΗΡΗΣΗΣ']||'',
+    onomasia: row['CHECKLIST ΟΝΟΜΑΣΙΑ']||'',
+    logidrio: row['ΛΟΓΙΔΡΙΟ']||'',
+    sxolia:   '',
+    checked:  false
+  }));
+  renderCL();go('s3');
+}
+
+function renderCL(){
+  const chk=clItems.filter(i=>i.checked).length, tot=clItems.length;
+  document.getElementById('prog-txt').textContent=`${chk} / ${tot}`;
+  document.getElementById('prog-fill').style.width=tot?`${(chk/tot)*100}%`:'0%';
+  document.getElementById('unc').textContent=tot-chk;
+  const prev={};
+  clItems.forEach((_,i)=>{const t=document.getElementById(`ta${i}`);if(t)prev[i]=t.value;});
+  document.getElementById('clist').innerHTML=clItems.map((item,i)=>`
+    <div class="ci ${item.checked?'chk':''}" id="ci${i}">
+      <div class="ci-top" onclick="togChk(${i})">
+        <div class="cbox">${item.checked?'✓':''}</div>
+        <div class="ci-body">
+          <div class="ci-id">${esc(item.idPar)}</div>
+          <div class="ci-name">${esc(item.onomasia)}</div>
+          ${item.logidrio?`<div class="ci-log">${esc(item.logidrio)}</div>`:''}
+        </div>
+      </div>
+      <div class="ci-cmt-wrap">
+        <textarea id="ta${i}" class="cmt" placeholder="Σχόλια (ΣΧΟΛΙΑ)..." oninput="updCmt(${i},this.value)">${esc(item.sxolia)}</textarea>
+      </div>
+    </div>`).join('');
+  Object.keys(prev).forEach(i=>{
+    const t=document.getElementById(`ta${i}`);
+    if(t&&prev[i]){t.value=prev[i];clItems[i].sxolia=prev[i];}
+  });
+}
+function togChk(i){
+  const ta=document.getElementById(`ta${i}`);
+  if(ta)clItems[i].sxolia=ta.value;
+  clItems[i].checked=!clItems[i].checked;
+  renderCL();
+}
+function updCmt(i,v){
+  clItems[i].sxolia=v;
+  document.getElementById('unc').textContent=clItems.filter(x=>!x.checked).length;
+}
+
+// ── SAVE ──
+function saveResults(){
+  clItems.forEach((_,i)=>{const t=document.getElementById(`ta${i}`);if(t)clItems[i].sxolia=t.value;});
+  const unc=clItems.filter(i=>!i.checked);
+  if(!unc.length){toast('✅ Όλα συμμορφώθηκαν — τίποτα να αποθηκευτεί!','ok');return;}
+
+  const r=curRec, now=new Date();
+  const ds=now.toLocaleDateString('el-GR'), ts=now.toLocaleTimeString('el-GR',{hour:'2-digit',minute:'2-digit'});
+
+  const lines=[
+    `ΑΠΟΤΕΛΕΣΜΑΤΑ ΣΥΝΤΗΡΗΣΗΣ — ${ds}  ${ts}`,
+    '='.repeat(55),
+    `Α/Α:            ${r.aa}`,
+    `Τύπος:          ${r.typos}`,
+    `Διεύθυνση:      ${r.dieuthynsi}`,
+    `Περιοχή / ΤΚ:   ${r.periochi}  ${r.tk}`,
+    `Ανελκυστήρας:   ${r.anelk}`,
+    `Επωνυμία:       ${r.eponymia}`,
+    `Τεχνικός:       ${r.technikos}`,
+    `Προέλευση:      ${r.proeleusi}`,
+    '',
+    `─── ΜΗ ΣΥΜΜΟΡΦΩΜΕΝΑ (${unc.length} / ${clItems.length}) ───`,
+    '',
+    ...unc.flatMap((item,n)=>[
+      `${n+1}. [${item.idPar}] ${item.onomasia}`,
+      item.logidrio?`   Λογίδριο: ${item.logidrio}`:'',
+      item.sxolia  ?`   Σχόλια:   ${item.sxolia}`  :'',''
+    ]).filter(l=>l!==undefined),
+    ...(r.paratiriseis?[`─── ΠΑΡΑΤΗΡΗΣΕΙΣ ───`,r.paratiriseis]:[])
+  ];
+
+  const content=lines.join('\n');
+  const safe=(r.dieuthynsi||'record').replace(/[^α-ωΑ-Ωa-zA-Z0-9]/g,'_').slice(0,40);
+  const fname=`syntirisi_${safe}_${ds.replace(/\//g,'-')}.txt`;
+  const btn=document.getElementById('btn-save');
+
+  const doAfterSave = () => {
+    // Save to local history
+    recordSaved(r, unc);
+    renderList(); // refresh list to show green
+    toast('✅ Αποθηκεύτηκε!','ok');
+  };
+
+  if(token){
+    btn.disabled=true;btn.innerHTML='<div class="spin" style="width:18px;height:18px;border-width:2px"></div>  Αποθήκευση...';
+    saveDrive(content,fname)
+      .then(()=>doAfterSave())
+      .catch(e=>{console.error(e);toast('⚠️ Drive απέτυχε — αποθήκευση τοπικά','err');dlLocal(content,fname);doAfterSave();})
+      .finally(()=>{btn.disabled=false;btn.innerHTML='💾  Αποθήκευση αποτελεσμάτων';});
+  } else {
+    dlLocal(content,fname);
+    doAfterSave();
+  }
+}
+
+async function saveDrive(content,fname){
+  const b='-------bnd123';
+  const meta=JSON.stringify({name:fname,mimeType:'text/plain'});
+  const body=`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n--${b}\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\n${content}\r\n--${b}--`;
+  const res=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{
+    method:'POST',
+    headers:{Authorization:`Bearer ${token}`,'Content-Type':`multipart/related; boundary="${b}"`},
+    body
+  });
+  if(!res.ok)throw new Error(await res.text());
+}
+function dlLocal(content,fname){
+  const a=Object.assign(document.createElement('a'),{
+    href:URL.createObjectURL(new Blob([content],{type:'text/plain;charset=utf-8'})),
+    download:fname
+  });
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+
+// ── HISTORY SCREEN ──
+function openHistory(r){
+  const h=loadHistory();
+  const hData=h[histKey(r)];
+  document.getElementById('h-title').textContent=r.dieuthynsi||'Ιστορικό';
+  document.getElementById('h-sub').textContent=`${r.typos} · ${r.anelk}`;
+
+  const el=document.getElementById('hist-scroll');
+
+  if(!hData||!hData.saves.length){
+    el.innerHTML=`<div class="hist-empty">Δεν βρέθηκε ιστορικό για αυτόν τον ανελκυστήρα.</div>`;
+    go('s4');return;
+  }
+
+  const saves=hData.saves;
+  el.innerHTML=`
+    <div class="hist-header">
+      <div class="hist-header-title">🛗 ${esc(r.dieuthynsi)}</div>
+      <div class="hist-header-meta">${esc(r.anelk)} · ${esc(r.eponymia)} · ${esc(r.technikos)}</div>
+      <div class="hist-header-meta" style="margin-top:4px">${saves.length} αποθήκευση/εις · ${saves[0].date} τελευταία</div>
+    </div>
+
+    ${saves.map((s,si)=>`
+      <div class="hist-entry">
+        <div class="hist-entry-hdr">
+          <span class="hist-entry-date">📅 ${s.date} · ${s.time}</span>
+          <span class="hist-entry-count">${s.unchecked.length} μη συμμ.</span>
+        </div>
+        <div class="hist-rows">
+          ${s.unchecked.length===0
+            ? '<div style="font-size:13px;color:var(--ok);padding:4px 0">✅ Όλα συμμορφώθηκαν</div>'
+            : s.unchecked.map(item=>`
+              <div class="hist-row">
+                <div class="hist-row-id">${esc(item.idPar)}</div>
+                <div class="hist-row-name">${esc(item.onomasia)}</div>
+                ${item.logidrio?`<div class="hist-row-log">${esc(item.logidrio)}</div>`:''}
+                ${item.sxolia?`<div class="hist-row-cmt">💬 ${esc(item.sxolia)}</div>`:''}
+              </div>`).join('')
+          }
+        </div>
+      </div>`).join('')}
+
+    <button class="btn btn-danger" onclick="clearHistory('${esc(histKey(r))}')">🗑 Διαγραφή ιστορικού για αυτόν τον ανελκυστήρα</button>
+  `;
+
+  go('s4');
+}
+
+function clearHistory(key){
+  if(!confirm('Διαγραφή ιστορικού για αυτόν τον ανελκυστήρα;'))return;
+  const h=loadHistory();
+  delete h[key];
+  saveHistory(h);
+  renderList();
+  go('s2');
+  toast('🗑 Ιστορικό διαγράφηκε','ok');
+}
+
+// ── HELPERS ──
+function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function closeMod(){document.getElementById('cl-modal').classList.remove('show');}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+let _tt;
+function toast(msg,type){const e=document.getElementById('toast');e.textContent=msg;e.className=`toast show ${type}`;clearTimeout(_tt);_tt=setTimeout(()=>e.classList.remove('show'),3200);}
+
+// ── INIT: wire up all buttons and file inputs after DOM ready ──
+document.addEventListener('DOMContentLoaded', function(){
+
+  // Main programme file — button triggers hidden input
+  const btnLocalProg = document.getElementById('btn-local-prog');
+  const inputProg    = document.getElementById('lf-prog');
+  if(btnLocalProg && inputProg){
+    btnLocalProg.addEventListener('click', ()=>inputProg.click());
+    inputProg.addEventListener('change', function(){
+      const f = this.files[0];
+      if(!f){ toast('Δεν επιλέχτηκε αρχείο','err'); return; }
+      toast('⏳ Φόρτωση προγράμματος...','');
+      readFileAs(f, (buf, name)=>parseProg(buf, name));
+      this.value = ''; // reset so same file triggers again next time
+    });
+  }
+
+  // Checklist file
+  const btnLocalCL = document.getElementById('btn-local-cl');
+  const inputCL    = document.getElementById('lf-cl');
+  if(btnLocalCL && inputCL){
+    btnLocalCL.addEventListener('click', ()=>inputCL.click());
+    inputCL.addEventListener('change', function(){
+      const f = this.files[0];
+      if(!f) return;
+      toast('⏳ Φόρτωση checklist...','');
+      readFileAs(f, (buf)=>{ parseCL(buf); closeMod(); openCL(); });
+      this.value = '';
+    });
+  }
+
+});
+</script>
+</body>
+</html>
