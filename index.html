@@ -171,7 +171,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
   <div class="card">
     <div id="auth-pill" class="pill pill-no"><div class="dot"></div> Μη συνδεδεμένο</div>
     <h2>Φόρτωση Προγράμματος Ημέρας</h2>
-    <p>Συνδεθείτε με Google Drive και επιλέξτε το πρόγραμμα της ημέρας.</p>
+    <p>Συνδεθείτε με Google Drive και επιλέξτε το <strong>programma.xlsx</strong> της ημέρας.</p>
     <button class="btn btn-p" id="btn-drive" onclick="signInAndPick()"><span>🔗</span> Σύνδεση Google Drive</button>
     <div class="divider"><span>ή τοπικά</span></div>
     <p style="font-size:12px;color:var(--muted);margin-bottom:9px">Φόρτωση αρχείου από τη συσκευή:</p>
@@ -237,7 +237,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 <div class="mbg" id="cl-modal">
   <div class="modal">
     <h3>📋 Αρχείο Checklist</h3>
-    <p>Επιλέξτε το <strong>checklist.xlsx</strong> για να φορτωθούν οι παρατηρήσεις ελέγχου.</p>
+    <p>Φορτώστε το <strong>checklist.xlsx</strong> μία φορά — θα αποθηκευτεί αυτόματα για τις επόμενες χρήσεις.</p>
     <div class="mbtns">
       <button class="btn btn-p" onclick="pickCLDrive()">🔗 Από Google Drive</button>
       <input type="file" id="lf-cl" accept=".xlsx,.xls" style="display:none">
@@ -423,6 +423,8 @@ function parseProg(buf,name){
     document.getElementById('fname').textContent=name;
     document.getElementById('st-tot').textContent=records.length;
     filtered=[...records];
+    // Φόρτωσε checklist από localStorage αμέσως
+    if(!clTpl.length) loadCLFromStorage();
     renderList();go('s2');
     toast(`✅ ${records.length} εγγραφές φορτώθηκαν`,'ok');
   }catch(e){toast('❌ Σφάλμα ανάγνωσης','err');console.error(e);}
@@ -434,8 +436,22 @@ function parseCL(buf){
     const wb=XLSX.read(buf,{type:'array'});
     const ws=wb.Sheets[wb.SheetNames[0]];
     clTpl=XLSX.utils.sheet_to_json(ws,{defval:''});
+    // Αποθήκευση checklist στο localStorage για μελλοντικές χρήσεις
+    localStorage.setItem('syntirisi_checklist', JSON.stringify(clTpl));
     toast(`✅ ${clTpl.length} παρατηρήσεις φορτώθηκαν`,'ok');
   }catch(e){toast('❌ Σφάλμα checklist','err');console.error(e);}
+}
+
+// Φόρτωση checklist από localStorage αν υπάρχει
+function loadCLFromStorage(){
+  try{
+    const saved = localStorage.getItem('syntirisi_checklist');
+    if(saved){
+      clTpl = JSON.parse(saved);
+      return true;
+    }
+  }catch(e){ console.error(e); }
+  return false;
 }
 
 // ── RENDER LIST ──
@@ -488,6 +504,7 @@ function tapRec(idx){
   if(isRecordSaved(curRec)){
     openHistory(curRec);
   } else {
+    if(!clTpl.length) loadCLFromStorage();
     clTpl.length?openCL():document.getElementById('cl-modal').classList.add('show');
   }
 }
@@ -598,13 +615,17 @@ function saveResults(){
 
   if(token){
     btn.disabled=true;btn.innerHTML='<div class="spin" style="width:18px;height:18px;border-width:2px"></div>  Αποθήκευση...';
+    // Πάντα αποθήκευση τοπικά
+    dlLocal(content,fname);
+    // ΚΑΙ στο Drive αν υπάρχει σύνδεση
     saveDrive(content,fname)
-      .then(()=>doAfterSave())
-      .catch(e=>{console.error(e);toast('⚠️ Drive απέτυχε — αποθήκευση τοπικά','err');dlLocal(content,fname);doAfterSave();})
+      .then(()=>{ doAfterSave(); toast('✅ Αποθηκεύτηκε τοπικά + Drive!','ok'); })
+      .catch(e=>{ console.error(e); doAfterSave(); toast('✅ Αποθηκεύτηκε τοπικά (Drive απέτυχε)','err'); })
       .finally(()=>{btn.disabled=false;btn.innerHTML='💾  Αποθήκευση αποτελεσμάτων';});
   } else {
     dlLocal(content,fname);
     doAfterSave();
+    toast('💾 Αποθηκεύτηκε τοπικά','ok');
   }
 }
 
