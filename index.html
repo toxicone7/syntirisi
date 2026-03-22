@@ -171,7 +171,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
   <div class="card">
     <div id="auth-pill" class="pill pill-no"><div class="dot"></div> Μη συνδεδεμένο</div>
     <h2>Φόρτωση Προγράμματος Ημέρας</h2>
-    <p>Συνδεθείτε με Google Drive και επιλέξτε το <strong>programma.xlsx</strong> της ημέρας.</p>
+    <p>Συνδεθείτε με Google Drive και επιλέξτε το πρόγραμμα της ημέρας απο το αρχείο.</p>
     <button class="btn btn-p" id="btn-drive" onclick="signInAndPick()"><span>🔗</span> Σύνδεση Google Drive</button>
     <div class="divider"><span>ή τοπικά</span></div>
     <p style="font-size:12px;color:var(--muted);margin-bottom:9px">Φόρτωση αρχείου από τη συσκευή:</p>
@@ -630,13 +630,21 @@ async function saveDrive(content, fname){
   const FOLDER_ID = '146BhiY9xPIe_7V7x7LnFh7ocToaspd42';
   const b='-------bnd123';
   const meta=JSON.stringify({ name: fname, mimeType: 'text/plain', parents: [FOLDER_ID] });
-  const body=`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n--${b}\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\n${content}\r\n--${b}--`;
-  const res=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{
-    method:'POST',
-    headers:{ Authorization:`Bearer ${token}`, 'Content-Type':`multipart/related; boundary="${b}"` },
-    body
+  const blob = new Blob([content], {type:'text/plain;charset=utf-8'});
+
+  // Χρήση FormData για σωστό multipart με parents
+  const form = new FormData();
+  form.append('metadata', new Blob([meta], {type:'application/json'}));
+  form.append('file', blob);
+
+  const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,parents', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: form
   });
   if(!res.ok) throw new Error(await res.text());
+  const data = await res.json();
+  console.log('Saved to Drive:', data);
 }
 function dlLocal(content,fname){
   const a=Object.assign(document.createElement('a'),{
