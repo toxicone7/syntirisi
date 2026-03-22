@@ -171,7 +171,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
   <div class="card">
     <div id="auth-pill" class="pill pill-no"><div class="dot"></div> Μη συνδεδεμένο</div>
     <h2>Φόρτωση Προγράμματος Ημέρας</h2>
-    <p>Συνδεθείτε με Google Drive και επιλέξτε το πρόγραμμα της ημέρας.</p>
+    <p>Συνδεθείτε με Google Drive και επιλέξτε το <strong>programma.xlsx</strong> της ημέρας.</p>
     <button class="btn btn-p" id="btn-drive" onclick="signInAndPick()"><span>🔗</span> Σύνδεση Google Drive</button>
     <div class="divider"><span>ή τοπικά</span></div>
     <p style="font-size:12px;color:var(--muted);margin-bottom:9px">Φόρτωση αρχείου από τη συσκευή:</p>
@@ -607,38 +607,36 @@ function saveResults(){
   const btn=document.getElementById('btn-save');
 
   const doAfterSave = () => {
-    // Save to local history
     recordSaved(r, unc);
-    renderList(); // refresh list to show green
-    toast('✅ Αποθηκεύτηκε!','ok');
+    renderList();
   };
+
+  // Πάντα τοπικά
+  dlLocal(content, fname);
 
   if(token){
     btn.disabled=true;btn.innerHTML='<div class="spin" style="width:18px;height:18px;border-width:2px"></div>  Αποθήκευση...';
-    // Πάντα αποθήκευση τοπικά
-    dlLocal(content,fname);
-    // ΚΑΙ στο Drive αν υπάρχει σύνδεση
-    saveDrive(content,fname)
-      .then(()=>{ doAfterSave(); toast('✅ Αποθηκεύτηκε τοπικά + Drive!','ok'); })
-      .catch(e=>{ console.error(e); doAfterSave(); toast('✅ Αποθηκεύτηκε τοπικά (Drive απέτυχε)','err'); })
-      .finally(()=>{btn.disabled=false;btn.innerHTML='💾  Αποθήκευση αποτελεσμάτων';});
+    saveDrive(content, fname)
+      .then(()=>{ doAfterSave(); toast('✅ Τοπικά + Drive!','ok'); })
+      .catch(e=>{ console.error(e); doAfterSave(); toast('💾 Τοπικά (Drive απέτυχε)','err'); })
+      .finally(()=>{ btn.disabled=false; btn.innerHTML='💾  Αποθήκευση αποτελεσμάτων'; });
   } else {
-    dlLocal(content,fname);
     doAfterSave();
     toast('💾 Αποθηκεύτηκε τοπικά','ok');
   }
 }
 
-async function saveDrive(content,fname){
+async function saveDrive(content, fname){
+  const FOLDER_ID = '146BhiY9xPIe_7V7x7LnFh7ocToaspd42';
   const b='-------bnd123';
-  const meta=JSON.stringify({name:fname,mimeType:'text/plain'});
+  const meta=JSON.stringify({ name: fname, mimeType: 'text/plain', parents: [FOLDER_ID] });
   const body=`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n--${b}\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\n${content}\r\n--${b}--`;
   const res=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{
     method:'POST',
-    headers:{Authorization:`Bearer ${token}`,'Content-Type':`multipart/related; boundary="${b}"`},
+    headers:{ Authorization:`Bearer ${token}`, 'Content-Type':`multipart/related; boundary="${b}"` },
     body
   });
-  if(!res.ok)throw new Error(await res.text());
+  if(!res.ok) throw new Error(await res.text());
 }
 function dlLocal(content,fname){
   const a=Object.assign(document.createElement('a'),{
