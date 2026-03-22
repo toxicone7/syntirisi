@@ -171,7 +171,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
   <div class="card">
     <div id="auth-pill" class="pill pill-no"><div class="dot"></div> Μη συνδεδεμένο</div>
     <h2>Φόρτωση Προγράμματος Ημέρας</h2>
-    <p>Συνδεθείτε με Google Drive και επιλέξτε το πρόγραμμα της ημέρας απο το αρχείο.</p>
+    <p>Συνδεθείτε με Google Drive και επιλέξτε το ημερίσιο πρόγραμμα.</p>
     <button class="btn btn-p" id="btn-drive" onclick="signInAndPick()"><span>🔗</span> Σύνδεση Google Drive</button>
     <div class="divider"><span>ή τοπικά</span></div>
     <p style="font-size:12px;color:var(--muted);margin-bottom:9px">Φόρτωση αρχείου από τη συσκευή:</p>
@@ -343,16 +343,24 @@ function requestToken(){
       btn.disabled=false; btn.innerHTML='<span>🔗</span> Σύνδεση Google Drive';
       if(resp.error){ toast('❌ Αποτυχία σύνδεσης: '+resp.error,'err'); console.error(resp); return; }
       token = resp.access_token;
-      const p=document.getElementById('auth-pill');
-      p.className='pill pill-ok'; p.innerHTML='<div class="dot"></div> Συνδεδεμένο';
-      toast('✅ Συνδέθηκε!','ok');
+      // Αποθήκευση token — κρατάει μέχρι να κλείσει ο browser
+      const expires = Date.now() + (resp.expires_in * 1000);
+      sessionStorage.setItem('g_token', token);
+      sessionStorage.setItem('g_token_exp', expires);
+      setAuthUI(true);
       // Now load picker and open it
       gapi.load('picker', ()=>{
         if(pickerCallback) openPicker(pickerCallback);
       });
     }
   });
-  client.requestAccessToken({prompt:'consent'});
+  client.requestAccessToken({prompt:''});
+}
+
+function setAuthUI(showToast){
+  const p=document.getElementById('auth-pill');
+  p.className='pill pill-ok'; p.innerHTML='<div class="dot"></div> Συνδεδεμένο';
+  if(showToast) toast('✅ Συνδέθηκε!','ok');
 }
 
 function openPicker(cb){
@@ -721,6 +729,14 @@ function toast(msg,type){const e=document.getElementById('toast');e.textContent=
 
 // ── INIT: wire up all buttons and file inputs after DOM ready ──
 document.addEventListener('DOMContentLoaded', function(){
+
+  // Επαναφορά token από sessionStorage αν δεν έχει λήξει
+  const savedToken = sessionStorage.getItem('g_token');
+  const savedExp   = parseInt(sessionStorage.getItem('g_token_exp')||'0');
+  if(savedToken && Date.now() < savedExp - 60000){
+    token = savedToken;
+    setAuthUI(false); // δείξε "Συνδεδεμένο" χωρίς toast
+  }
 
   // Main programme file — button triggers hidden input
   const btnLocalProg = document.getElementById('btn-local-prog');
