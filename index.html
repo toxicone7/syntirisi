@@ -765,7 +765,7 @@ function saveResults(){
 
   const content=lines.join('\n');
   const safe=(r.dieuthynsi||'record').replace(/[^α-ωΑ-Ωa-zA-Z0-9]/g,'_').slice(0,40);
-  const fname=`syntirisi_${safe}_${ds.replace(/\//g,'-')}.txt`;
+  const fname=`${safe}_${ds.replace(/\//g,'-')}.txt`;
   const btn=document.getElementById('btn-save');
 
   const doAfterSave = () => {
