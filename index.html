@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Συντήρηση App</title>
+<title>VALIDX - Elevator Checklist</title>
 <link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="logo.png">
 <meta name="theme-color" content="#0f1923">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -25,14 +26,14 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 .hdr{background:var(--surface);border-bottom:1px solid var(--border);padding:13px 15px;display:flex;align-items:center;gap:11px;position:sticky;top:0;z-index:100}
 .back{width:40px;height:40px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--accent);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
 .back:active{transform:scale(.88)}
-.htitle{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hsub{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-top:2px}
+.htitle{font-size:18px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hsub{font-size:13px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-top:2px}
 
 /* SCREEN 1 */
 #s1{align-items:center;justify-content:center;gap:26px;padding:30px 18px;
   background:radial-gradient(ellipse at 25% 20%,#1a3a5c33 0%,transparent 55%),var(--bg)}
-.logo{text-align:center}
-.logo-icon{width:66px;height:66px;background:linear-gradient(135deg,var(--accent),#0077aa);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 13px;box-shadow:0 0 40px #00c2ff33}
+.logo{text-align:center;display:flex;flex-direction:column;align-items:center;gap:0.1px}
+.logo-icon{width:66px;height:66px;background:linear-gradient(135deg,var(--accent),#0077aa);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 3px;box-shadow:0 0 40px #00c2ff33}
 .logo-title{font-size:23px;font-weight:700;letter-spacing:-.5px}
 .logo-sub{font-size:11px;color:var(--muted);margin-top:4px;font-family:'IBM Plex Mono',monospace}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;width:100%;max-width:450px}
@@ -55,11 +56,11 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 /* SCREEN 2 */
 #s2{background:var(--bg)}
 .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:9px 13px;display:flex;gap:7px;flex-wrap:wrap;align-items:center}
-.chip{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 9px;font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--muted)}
+.chip{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 11px;font-size:14px;font-family:'IBM Plex Mono',monospace;color:var(--muted)}
 .chip b{color:var(--accent)}
 .chip-ok b{color:var(--ok)}
 .srch-wrap{padding:9px 13px;background:var(--surface);border-bottom:1px solid var(--border)}
-.srch{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+.srch{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:16px;outline:none;transition:border-color .2s}
 .srch:focus{border-color:var(--accent)}
 .srch::placeholder{color:var(--muted)}
 .rlist{flex:1;overflow-y:auto;padding:9px 11px;display:flex;flex-direction:column;gap:7px}
@@ -72,16 +73,16 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 .rc.saved:active{background:#00e67625}
 
 .rc-r1{display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap}
-.rc-id{font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 6px}
-.rc-type{font-size:10px;color:var(--accent);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.8px}
-.badge-saved{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--ok);background:#00e67618;border:1px solid #00e67640;border-radius:20px;padding:2px 8px;margin-left:auto}
-.rc-addr{font-size:15px;font-weight:600;margin-bottom:4px}
-.rc-ep{font-size:12px;color:var(--muted);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tags{display:flex;gap:5px;flex-wrap:wrap}
-.tag{font-size:11px;padding:2px 7px;border-radius:4px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
-.rc-note{margin-top:5px;font-size:11px;color:var(--muted);font-style:italic;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-.rc-saved-info{margin-top:7px;font-size:11px;color:var(--ok);display:flex;align-items:center;gap:5px}
-.rc-arr{position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:20px}
+.rc-id{font-size:13px;font-family:'IBM Plex Mono',monospace;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:3px 8px}
+.rc-type{font-size:13px;color:var(--accent);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.8px}
+.badge-saved{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--ok);background:#00e67618;border:1px solid #00e67640;border-radius:20px;padding:3px 10px;margin-left:auto}
+.rc-addr{font-size:19px;font-weight:600;margin-bottom:5px}
+.rc-ep{font-size:15px;color:var(--muted);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:13px;padding:4px 10px;border-radius:4px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.rc-note{margin-top:6px;font-size:13px;color:var(--muted);font-style:italic;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.rc-saved-info{margin-top:7px;font-size:13px;color:var(--ok);display:flex;align-items:center;gap:5px}
+.rc-arr{position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:26px}
 
 /* SCREEN 3 */
 #s3{background:var(--bg)}
@@ -90,7 +91,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 .igv{font-size:13px;font-weight:600;margin-top:2px}
 .ig-full{grid-column:1/-1}
 .prog-wrap{padding:10px 13px;background:var(--surface);border-bottom:1px solid var(--border)}
-.prog-lbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px}
+.prog-lbl{display:flex;justify-content:space-between;font-size:14px;color:var(--muted);margin-bottom:5px}
 .prog-track{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden}
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--ok));border-radius:3px;transition:width .3s}
 .clist{flex:1;overflow-y:auto;padding:9px 11px;display:flex;flex-direction:column;gap:5px}
@@ -100,14 +101,23 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 .cbox{width:26px;height:26px;min-width:26px;border-radius:7px;border:2px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:14px;color:transparent;transition:all .15s;margin-top:1px}
 .ci.chk .cbox{background:var(--ok);border-color:var(--ok);color:#000;font-weight:700}
 .ci-body{flex:1;min-width:0}
-.ci-id{font-size:10px;color:var(--accent2);font-family:'IBM Plex Mono',monospace;font-weight:600;margin-bottom:3px}
-.ci-name{font-size:14px;font-weight:600;margin-bottom:3px}
-.ci-log{font-size:12px;color:var(--muted);line-height:1.4}
+.ci-id{font-size:12px;color:var(--accent2);font-family:'IBM Plex Mono',monospace;font-weight:600;margin-bottom:3px}
+.ci-name{font-size:16px;font-weight:600;margin-bottom:4px}
+.ci-log{font-size:14px;color:var(--muted);line-height:1.5}
 .ci.chk .ci-name,.ci.chk .ci-log{opacity:.45;text-decoration:line-through;text-decoration-color:var(--muted)}
 .ci-cmt-wrap{padding:0 12px 12px}
-.cmt{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:13px;outline:none;resize:none;min-height:52px;transition:border-color .2s;display:block}
+.cmt{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px 12px;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:15px;outline:none;resize:none;min-height:60px;transition:border-color .2s;display:block}
 .cmt:focus{border-color:var(--accent)}
 .cmt::placeholder{color:var(--muted)}
+
+/* Category section header */
+.cat-header{padding:14px 12px 6px;display:flex;align-items:center;gap:10px}
+.cat-header::after{content:'';flex:1;height:1px;background:var(--border)}
+.cat-label{font-size:12px;font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;white-space:nowrap}
+
+/* Σ — Σημειώσεις item */
+.ci-sigma{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;border-left:3px solid var(--accent)}
+.ci-sigma-label{padding:12px 12px 6px;font-size:15px;font-weight:600;color:var(--text)}
 .save-bar{padding:13px;background:var(--surface);border-top:1px solid var(--border);display:flex;flex-direction:column;gap:7px}
 .save-sum{font-size:12px;color:var(--muted);text-align:center;font-family:'IBM Plex Mono',monospace}
 .save-sum b{color:var(--accent2)}
@@ -164,19 +174,19 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 <!-- ══ S1: LOAD ══ -->
 <div id="s1" class="screen active">
   <div class="logo">
-    <div class="logo-icon">🛗</div>
-    <div class="logo-title">Συντήρηση</div>
-    <div class="logo-sub">ELEVATOR MAINTENANCE TRACKER</div>
+    <img src="logo.png" style="width:166px;height:166px;border-radius:18px;object-fit:contain;display:block;margin-bottom:0;">
+    <div class="logo-title">ELEVATOR CHECKLIST</div>
+    <!--<div class="logo-sub">ELEVATOR CHECKLIST</div> -->
   </div>
   <div class="card">
     <div id="auth-pill" class="pill pill-no"><div class="dot"></div> Μη συνδεδεμένο</div>
     <h2>Φόρτωση Προγράμματος Ημέρας</h2>
-    <p>Συνδεθείτε με Google Drive και επιλέξτε το ημερίσιο πρόγραμμα.</p>
-    <button class="btn btn-p" id="btn-drive" onclick="signInAndPick()"><span>🔗</span> Σύνδεση Google Drive</button>
+    <p>Συνδεθείτε με Google Drive και επιλέξτε το αρχείο με το πρόγραμμα της ημέρας.</p>
+    <button class="btn btn-p" id="btn-drive" onclick="signInAndPick()">Σύνδεση Google Drive</button>
     <div class="divider"><span>ή τοπικά</span></div>
     <p style="font-size:12px;color:var(--muted);margin-bottom:9px">Φόρτωση αρχείου από τη συσκευή:</p>
     <input type="file" id="lf-prog" accept=".xlsx,.xls" style="display:none">
-    <button class="btn btn-o" id="btn-local-prog">📂 Άνοιγμα τοπικού αρχείου</button>
+    <button class="btn btn-o" id="btn-local-prog">Άνοιγμα τοπικού αρχείου</button>
   </div>
 </div>
 
@@ -217,7 +227,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
   <div class="clist" id="clist"></div>
   <div class="save-bar">
     <div class="save-sum">Μη συμμορφωμένα (προς αποθήκευση): <b id="unc">0</b></div>
-    <button class="btn btn-save" id="btn-save" onclick="saveResults()">💾  Αποθήκευση αποτελεσμάτων</button>
+    <button class="btn btn-save" id="btn-save" onclick="saveResults()">Αποθήκευση αποτελεσμάτων</button>
   </div>
 </div>
 
@@ -236,12 +246,12 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 <!-- MODAL: pick checklist -->
 <div class="mbg" id="cl-modal">
   <div class="modal">
-    <h3>📋 Αρχείο Checklist</h3>
+    <h3>Αρχείο Checklist</h3>
     <p>Φορτώστε το <strong>checklist.xlsx</strong> μία φορά — θα αποθηκευτεί αυτόματα για τις επόμενες χρήσεις.</p>
     <div class="mbtns">
-      <button class="btn btn-p" onclick="pickCLDrive()">🔗 Από Google Drive</button>
+      <button class="btn btn-p" onclick="pickCLDrive()">Από Google Drive</button>
       <input type="file" id="lf-cl" accept=".xlsx,.xls" style="display:none">
-      <button class="btn btn-o" style="width:100%;margin:0" id="btn-local-cl">📂 Από τη συσκευή</button>
+      <button class="btn btn-o" style="width:100%;margin:0" id="btn-local-cl">Από τη συσκευή</button>
       <button class="btn btn-o" style="margin:0" onclick="closeMod()">Ακύρωση</button>
     </div>
   </div>
@@ -494,7 +504,7 @@ function renderList(){
         ${r.anelk?`<span class="tag">🛗 ${esc(r.anelk)}</span>`:''}
       </div>
       ${saved&&lastSave?`<div class="rc-saved-info">✅ Τελευταία αποθήκευση: ${lastSave.date} ${lastSave.time} · ${lastSave.unchecked.length} μη συμμ.</div>`:''}
-      ${!saved&&r.paratiriseis?`<div class="rc-note">💬 ${esc(r.paratiriseis)}</div>`:''}
+      ${!saved&&r.paratiriseis?`<div class="rc-note">${esc(r.paratiriseis)}</div>`:''}
       <div class="rc-arr">›</div>
     </div>`}).join('');
 }
@@ -518,6 +528,11 @@ function tapRec(idx){
 }
 
 // ── OPEN CHECKLIST ──
+// Category prefix map
+const CAT_LABELS = { 'Μ':'Μηχανοστάσιο', 'Θ':'Θάλαμος', 'Φ':'Φρεάτιο', 'Τ':'Τεχνικός Φάκελος', 'Σ':'Σημειώσεις' };
+function catPrefix(idPar){ return (idPar||'').charAt(0).toUpperCase(); }
+function catLabel(idPar){ return CAT_LABELS[catPrefix(idPar)] || ''; }
+
 function openCL(){
   const r=curRec;
   document.getElementById('cl-title').textContent=r.dieuthynsi||'Λίστα Ελέγχου';
@@ -528,7 +543,7 @@ function openCL(){
     <div><div class="igl">Τύπος</div><div class="igv">${esc(r.typos)}</div></div>
     <div><div class="igl">Τεχνικός</div><div class="igv">${esc(r.technikos)}</div></div>
     <div class="ig-full"><div class="igl">Ανελκυστήρας</div><div class="igv">${esc(r.anelk)} · ${esc(r.eponymia)}</div></div>
-    ${r.paratiriseis?`<div class="ig-full"><div class="igl">Παρατηρήσεις</div><div class="igv" style="font-size:12px;font-weight:400;color:var(--muted)">${esc(r.paratiriseis)}</div></div>`:''}
+    ${r.paratiriseis?`<div class="ig-full"><div class="igl">Παρατηρήσεις</div><div class="igv" style="font-size:14px;font-weight:400;color:var(--muted)">${esc(r.paratiriseis)}</div></div>`:''}
   `;
   clItems=clTpl.map((row,i)=>({
     id:i,
@@ -536,38 +551,72 @@ function openCL(){
     onomasia: row['CHECKLIST ΟΝΟΜΑΣΙΑ']||'',
     logidrio: row['ΛΟΓΙΔΡΙΟ']||'',
     sxolia:   '',
+    isSigma:  (row['ID ΠΑΡΑΤΗΡΗΣΗΣ']||'').charAt(0).toUpperCase()==='Σ',
     checked:  false
   }));
   renderCL();go('s3');
 }
 
 function renderCL(){
-  const chk=clItems.filter(i=>i.checked).length, tot=clItems.length;
+  // Count only non-Σ items for progress
+  const checkable = clItems.filter(i=>!i.isSigma);
+  const chk = checkable.filter(i=>i.checked).length;
+  const tot = checkable.length;
   document.getElementById('prog-txt').textContent=`${chk} / ${tot}`;
   document.getElementById('prog-fill').style.width=tot?`${(chk/tot)*100}%`:'0%';
   document.getElementById('unc').textContent=tot-chk;
+
+  // Save textarea values before re-render
   const prev={};
   clItems.forEach((_,i)=>{const t=document.getElementById(`ta${i}`);if(t)prev[i]=t.value;});
-  document.getElementById('clist').innerHTML=clItems.map((item,i)=>`
-    <div class="ci ${item.checked?'chk':''}" id="ci${i}">
-      <div class="ci-top" onclick="togChk(${i})">
-        <div class="cbox">${item.checked?'✓':''}</div>
-        <div class="ci-body">
-          <div class="ci-id">${esc(item.idPar)}</div>
-          <div class="ci-name">${esc(item.onomasia)}</div>
-          ${item.logidrio?`<div class="ci-log">${esc(item.logidrio)}</div>`:''}
-        </div>
-      </div>
-      <div class="ci-cmt-wrap">
-        <textarea id="ta${i}" class="cmt" placeholder="Σχόλια (ΣΧΟΛΙΑ)..." oninput="updCmt(${i},this.value)">${esc(item.sxolia)}</textarea>
-      </div>
-    </div>`).join('');
+
+  // Build HTML with category section headers
+  let html='', lastCat='';
+  clItems.forEach((item,i)=>{
+    const cat=catPrefix(item.idPar);
+    const label=catLabel(item.idPar);
+    // Insert category header when category changes
+    if(label && cat!==lastCat){
+      html+=`<div class="cat-header"><span class="cat-label">${esc(label)}</span></div>`;
+      lastCat=cat;
+    }
+
+    if(item.isSigma){
+      // Σ = Σημειώσεις — always-visible textarea, no checkbox
+      html+=`
+        <div class="ci ci-sigma" id="ci${i}">
+          <div class="ci-sigma-label">${esc(item.idPar)} — ${esc(item.onomasia)}</div>
+          <div class="ci-cmt-wrap">
+            <textarea id="ta${i}" class="cmt" placeholder="Γράψτε σημειώσεις εδώ..." oninput="updCmt(${i},this.value)">${esc(item.sxolia)}</textarea>
+          </div>
+        </div>`;
+    } else {
+      html+=`
+        <div class="ci ${item.checked?'chk':''}" id="ci${i}">
+          <div class="ci-top" onclick="togChk(${i})">
+            <div class="cbox">${item.checked?'✓':''}</div>
+            <div class="ci-body">
+              <div class="ci-name">${esc(item.idPar)} — ${esc(item.onomasia)}</div>
+              ${item.logidrio?`<div class="ci-log">${esc(item.logidrio)}</div>`:''}
+            </div>
+          </div>
+          <div class="ci-cmt-wrap">
+            <textarea id="ta${i}" class="cmt" placeholder="Σχόλια..." oninput="updCmt(${i},this.value)">${esc(item.sxolia)}</textarea>
+          </div>
+        </div>`;
+    }
+  });
+  document.getElementById('clist').innerHTML=html;
+
+  // Restore textarea values
   Object.keys(prev).forEach(i=>{
     const t=document.getElementById(`ta${i}`);
     if(t&&prev[i]){t.value=prev[i];clItems[i].sxolia=prev[i];}
   });
 }
+
 function togChk(i){
+  if(clItems[i].isSigma) return; // Σ δεν κάνει toggle
   const ta=document.getElementById(`ta${i}`);
   if(ta)clItems[i].sxolia=ta.value;
   clItems[i].checked=!clItems[i].checked;
@@ -575,14 +624,23 @@ function togChk(i){
 }
 function updCmt(i,v){
   clItems[i].sxolia=v;
-  document.getElementById('unc').textContent=clItems.filter(x=>!x.checked).length;
+  const checkable=clItems.filter(x=>!x.isSigma);
+  document.getElementById('unc').textContent=checkable.filter(x=>!x.checked).length;
 }
 
 // ── SAVE ──
 function saveResults(){
   clItems.forEach((_,i)=>{const t=document.getElementById(`ta${i}`);if(t)clItems[i].sxolia=t.value;});
-  const unc=clItems.filter(i=>!i.checked);
-  if(!unc.length){toast('✅ Όλα συμμορφώθηκαν — τίποτα να αποθηκευτεί!','ok');return;}
+
+  // Unchecked = non-Σ items that are not checked
+  const unc = clItems.filter(i=>!i.isSigma && !i.checked);
+  // Σημειώσεις = all Σ items (always saved)
+  const sigma = clItems.filter(i=>i.isSigma);
+
+  if(!unc.length && !sigma.some(s=>s.sxolia.trim())){
+    toast('✅ Όλα συμμορφώθηκαν — τίποτα να αποθηκευτεί!','ok');
+    return;
+  }
 
   const r=curRec, now=new Date();
   const ds=now.toLocaleDateString('el-GR'), ts=now.toLocaleTimeString('el-GR',{hour:'2-digit',minute:'2-digit'});
@@ -599,15 +657,29 @@ function saveResults(){
     `Τεχνικός:       ${r.technikos}`,
     `Προέλευση:      ${r.proeleusi}`,
     '',
-    `─── ΜΗ ΣΥΜΜΟΡΦΩΜΕΝΑ (${unc.length} / ${clItems.length}) ───`,
-    '',
-    ...unc.flatMap((item,n)=>[
-      `${n+1}. [${item.idPar}] ${item.onomasia}`,
-      item.logidrio?`   Λογίδριο: ${item.logidrio}`:'',
-      item.sxolia  ?`   Σχόλια:   ${item.sxolia}`  :'',''
-    ]).filter(l=>l!==undefined),
-    ...(r.paratiriseis?[`─── ΠΑΡΑΤΗΡΗΣΕΙΣ ───`,r.paratiriseis]:[])
   ];
+
+  if(unc.length){
+    lines.push(`─── ΜΗ ΣΥΜΜΟΡΦΩΜΕΝΑ (${unc.length} / ${clItems.filter(i=>!i.isSigma).length}) ───`);
+    lines.push('');
+    unc.forEach((item,n)=>{
+      lines.push(`${n+1}. ${item.logidrio||item.onomasia}`);
+      if(item.sxolia.trim()) lines.push(`Σχόλια: ${item.sxolia.trim()}`);
+      lines.push('');
+    });
+  }
+
+  const sigmaWithText = sigma.filter(s=>s.sxolia.trim());
+  if(sigmaWithText.length){
+    lines.push(`─── ΣΗΜΕΙΩΣΕΙΣ ───`);
+    lines.push('');
+    sigmaWithText.forEach(item=>{
+      lines.push(`${item.onomasia}: ${item.sxolia.trim()}`);
+      lines.push('');
+    });
+  }
+
+  if(r.paratiriseis){ lines.push(`─── ΠΑΡΑΤΗΡΗΣΕΙΣ ───`); lines.push(r.paratiriseis); }
 
   const content=lines.join('\n');
   const safe=(r.dieuthynsi||'record').replace(/[^α-ωΑ-Ωa-zA-Z0-9]/g,'_').slice(0,40);
@@ -619,17 +691,18 @@ function saveResults(){
     renderList();
   };
 
-  // Πάντα τοπικά
+  // Τοπικά + αμέσως back στη λίστα
   dlLocal(content, fname);
+  doAfterSave();
+  go('s2');
 
   if(token){
-    btn.disabled=true;btn.innerHTML='<div class="spin" style="width:18px;height:18px;border-width:2px"></div>  Αποθήκευση...';
+    // Drive upload στο background — δεν κρατάει τον χρήστη
+    toast('⏳ Ανέβασμα στο Drive...','');
     saveDrive(content, fname)
-      .then(()=>{ doAfterSave(); toast('✅ Τοπικά + Drive!','ok'); })
-      .catch(e=>{ console.error(e); doAfterSave(); toast('💾 Τοπικά (Drive απέτυχε)','err'); })
-      .finally(()=>{ btn.disabled=false; btn.innerHTML='💾  Αποθήκευση αποτελεσμάτων'; });
+      .then(()=>{ toast('✅ Τοπικά + Drive!','ok'); })
+      .catch(e=>{ console.error(e); toast('💾 Τοπικά (Drive απέτυχε)','err'); });
   } else {
-    doAfterSave();
     toast('💾 Αποθηκεύτηκε τοπικά','ok');
   }
 }
