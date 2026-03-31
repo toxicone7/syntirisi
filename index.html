@@ -110,7 +110,14 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 .cmt:focus{border-color:var(--accent)}
 .cmt::placeholder{color:var(--muted)}
 
-/* Category section header */
+/* YES / NO buttons per checklist item */
+.yn-wrap{display:flex;gap:8px;padding:0 12px 12px}
+.yn-btn{flex:1;padding:10px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);color:var(--muted);font-family:'IBM Plex Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.5px}
+.yn-btn:active{transform:scale(.95)}
+.yn-btn.yes-sel{background:#00e67622;border-color:var(--ok);color:var(--ok)}
+.yn-btn.no-sel{background:#ff475722;border-color:var(--err);color:var(--err)}
+.ci.no-sel{border-color:#ff475744}
+.ci.yes-sel{border-color:#00e67633;background:#00e67605}
 .cat-header{padding:14px 12px 6px;display:flex;align-items:center;gap:10px}
 .cat-header::after{content:'';flex:1;height:1px;background:var(--border)}
 .cat-label{font-size:12px;font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;white-space:nowrap}
@@ -226,7 +233,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
   </div>
   <div class="clist" id="clist"></div>
   <div class="save-bar">
-    <div class="save-sum">Μη συμμορφωμένα (προς αποθήκευση): <b id="unc">0</b></div>
+    <div class="save-sum">Απαντήσεις NO (προς αποθήκευση): <b id="unc">0</b></div>
     <button class="btn btn-save" id="btn-save" onclick="saveResults()">Αποθήκευση αποτελεσμάτων</button>
   </div>
 </div>
@@ -260,8 +267,8 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 <!-- MODAL: sheet selection -->
 <div class="mbg" id="sheet-modal">
   <div class="modal">
-    <h3>📄 Επιλογή Τύπου Ελέγχου</h3>
-    <p>Επιλέξτε ποιο φύλλο checklist να χρησιμοποιηθεί για αυτόν τον ανελκυστήρα.</p>
+    <h3>📄 Τύπος Ελέγχου</h3>
+    <p>Επιλέξτε ποιο φύλλο checklist να χρησιμοποιηθεί.</p>
     <div class="mbtns" id="sheet-btns"></div>
   </div>
 </div>
@@ -276,6 +283,7 @@ const LS_KEY = 'syntirisi_history'; // localStorage key
 
 // ── STATE ──
 let records=[], filtered=[], clTpl=[], clItems=[], curRec=null, token=null;
+let clSheets={}, clActiveSheet='';
 
 // ══════════════════════════════════════
 // HISTORY (localStorage)
@@ -405,7 +413,7 @@ async function driveFile(id, name, target){
 
 function pickCLDrive(){
   if(!token){ toast('Συνδεθείτε πρώτα','err'); return; }
-  pickerCallback = f => driveFile(f.id, f.name, 'cl').then(()=>{ closeMod(); openCL(); });
+  pickerCallback = f => driveFile(f.id, f.name, 'cl').then(()=>{ closeMod(); pickSheetAndOpen(); });
   gapi.load('picker', ()=> openPicker(pickerCallback));
 }
 
@@ -451,75 +459,55 @@ function parseProg(buf,name){
     document.getElementById('st-tot').textContent=records.length;
     filtered=[...records];
     // Φόρτωσε checklist από localStorage αμέσως
-    if(!clTpl.length) loadCLFromStorage();
+    if(!Object.keys(clSheets).length) loadCLFromStorage();
     renderList();go('s2');
     toast(`✅ ${records.length} εγγραφές φορτώθηκαν`,'ok');
   }catch(e){toast('❌ Σφάλμα ανάγνωσης','err');console.error(e);}
 }
 
-// ── PARSE CHECKLIST.XLSX — stores ALL sheets ──
-let clSheets = {}; // { sheetName: [rows] }
-let clActiveSheet = ''; // currently selected sheet name
-
+// ── PARSE CHECKLIST.XLSX — αποθηκεύει ΟΛΑ τα φύλλα ──
 function parseCL(buf){
   try{
-    const wb = XLSX.read(buf, {type:'array'});
-    clSheets = {};
-    wb.SheetNames.forEach(name => {
-      const ws = wb.Sheets[name];
-      clSheets[name] = XLSX.utils.sheet_to_json(ws, {defval:''});
+    const wb=XLSX.read(buf,{type:'array'});
+    clSheets={};
+    wb.SheetNames.forEach(name=>{
+      clSheets[name]=XLSX.utils.sheet_to_json(wb.Sheets[name],{defval:''});
     });
-    // Αποθήκευση όλων των sheets στο localStorage
-    localStorage.setItem('syntirisi_checklist', JSON.stringify(clSheets));
+    localStorage.setItem('syntirisi_checklist',JSON.stringify(clSheets));
     toast(`✅ ${wb.SheetNames.length} φύλλα φορτώθηκαν`,'ok');
   }catch(e){toast('❌ Σφάλμα checklist','err');console.error(e);}
 }
 
+// Φόρτωση checklist από localStorage αν υπάρχει
 function loadCLFromStorage(){
   try{
-    const saved = localStorage.getItem('syntirisi_checklist');
+    const saved=localStorage.getItem('syntirisi_checklist');
     if(saved){
-      const parsed = JSON.parse(saved);
-      // Support both old format (array) and new format (object of sheets)
-      if(Array.isArray(parsed)){
-        clSheets = { 'Checklist': parsed };
-      } else {
-        clSheets = parsed;
-      }
-      return Object.keys(clSheets).length > 0;
+      const parsed=JSON.parse(saved);
+      clSheets=Array.isArray(parsed)?{'Checklist':parsed}:parsed;
+      return Object.keys(clSheets).length>0;
     }
-  }catch(e){ console.error(e); }
+  }catch(e){console.error(e);}
   return false;
 }
 
-// Show sheet picker then open checklist
 function pickSheetAndOpen(){
-  const names = Object.keys(clSheets);
-  if(names.length === 1){
-    // Only one sheet — open directly
-    clActiveSheet = names[0];
-    clTpl = clSheets[clActiveSheet];
-    openCL();
-    return;
+  const names=Object.keys(clSheets);
+  if(names.length===1){
+    clActiveSheet=names[0]; clTpl=clSheets[clActiveSheet]; openCL(); return;
   }
-  // Multiple sheets — show picker
-  const btns = document.getElementById('sheet-btns');
-  btns.innerHTML = names.map(name => `
-    <button class="btn btn-p" onclick="selectSheet('${esc(name)}')">${esc(name)}</button>
-  `).join('') + `<button class="btn btn-o" style="margin:0" onclick="closeSheetModal()">Ακύρωση</button>`;
+  const btns=document.getElementById('sheet-btns');
+  btns.innerHTML=names.map(name=>`
+    <button class="btn btn-p" onclick="selectSheet('${name.replace(/'/g,"\\'")}')">${esc(name)}</button>
+  `).join('')+`<button class="btn btn-o" style="margin:0" onclick="closeSheetModal()">Ακύρωση</button>`;
   document.getElementById('sheet-modal').classList.add('show');
 }
-
 function selectSheet(name){
-  clActiveSheet = name;
-  clTpl = clSheets[name];
-  closeSheetModal();
+  clActiveSheet=name; clTpl=clSheets[name];
+  document.getElementById('sheet-modal').classList.remove('show');
   openCL();
 }
-
-function closeSheetModal(){
-  document.getElementById('sheet-modal').classList.remove('show');
-}
+function closeSheetModal(){ document.getElementById('sheet-modal').classList.remove('show'); }
 
 // ── RENDER LIST ──
 function renderList(){
@@ -572,11 +560,8 @@ function tapRec(idx){
     openHistory(curRec);
   } else {
     if(!Object.keys(clSheets).length) loadCLFromStorage();
-    if(Object.keys(clSheets).length){
-      pickSheetAndOpen();
-    } else {
-      document.getElementById('cl-modal').classList.add('show');
-    }
+    if(Object.keys(clSheets).length){ pickSheetAndOpen(); }
+    else { document.getElementById('cl-modal').classList.add('show'); }
   }
 }
 
@@ -589,92 +574,110 @@ function catLabel(idPar){ return CAT_LABELS[catPrefix(idPar)] || ''; }
 function openCL(){
   const r=curRec;
   document.getElementById('cl-title').textContent=r.dieuthynsi||'Λίστα Ελέγχου';
-  document.getElementById('cl-sub').textContent=`${clActiveSheet} · ${r.periochi}`;
+  document.getElementById('cl-sub').textContent=`${clActiveSheet||r.typos} · ${r.periochi}`;
   document.getElementById('igrid').innerHTML=`
     <div><div class="igl">Διεύθυνση</div><div class="igv">${esc(r.dieuthynsi)}</div></div>
     <div><div class="igl">Περιοχή / ΤΚ</div><div class="igv">${esc(r.periochi)} ${esc(r.tk)}</div></div>
     <div><div class="igl">Τύπος</div><div class="igv">${esc(r.typos)}</div></div>
     <div><div class="igl">Τεχνικός</div><div class="igv">${esc(r.technikos)}</div></div>
     <div class="ig-full"><div class="igl">Ανελκυστήρας</div><div class="igv">${esc(r.anelk)} · ${esc(r.eponymia)}</div></div>
-    ${r.paratiriseis?`<div class="ig-full"><div class="igl">Παρατηρήσεις</div><div class="igv" style="font-size:14px;font-weight:400;color:var(--muted)">"${esc(r.paratiriseis)}</div></div>`:''}
+    ${r.paratiriseis?`<div class="ig-full"><div class="igl">Παρατηρήσεις</div><div class="igv" style="font-size:14px;font-weight:400;color:var(--muted)">${esc(r.paratiriseis)}</div></div>`:''}
   `;
+  // ── FIX #2: always build fresh items — never carry over previous record's data ──
   clItems=clTpl.map((row,i)=>{
-    const logidrio = row['ΛΟΓΙΔΡΙΟ']||'';
-    const isFreeText = logidrio.includes('Πληροφορίες για μένα') || logidrio.includes('Free text');
-    const isSigma = (row['ID ΠΑΡΑΤΗΡΗΣΗΣ']||'').charAt(0).toUpperCase()==='Σ';
+    const logidrio=row['ΛΟΓΙΔΡΙΟ']||'';
+    const isFreeText=logidrio.includes('Πληροφορίες για μένα')||logidrio.includes('Free text');
+    const isSigma=(row['ID ΠΑΡΑΤΗΡΗΣΗΣ']||'').charAt(0).toUpperCase()==='Σ';
     return {
       id:i,
       idPar:    row['ID ΠΑΡΑΤΗΡΗΣΗΣ']||'',
       onomasia: row['CHECKLIST ΟΝΟΜΑΣΙΑ']||'',
       logidrio: logidrio,
-      sxolia:   '',
-      isFreeText: isFreeText, // Πληροφορίες για μένα → always textarea
+      sxolia:   '', // ← always empty on new record
+      isFreeText: isFreeText,
       isSigma:  isSigma,
-      checked:  false
+      answer:   null, // null=unanswered, 'yes', 'no' — for YES/NO items
+      checked:  false // kept for compatibility
     };
   });
+  // Clear the checklist DOM immediately to prevent any stale values showing
+  document.getElementById('clist').innerHTML='';
   renderCL();go('s3');
 }
 
 function renderCL(){
-  // Count only real checkbox items for progress (exclude freeText and sigma)
-  const checkable = clItems.filter(i=>!i.isSigma && !i.isFreeText);
-  const chk = checkable.filter(i=>i.checked).length;
-  const tot = checkable.length;
-  document.getElementById('prog-txt').textContent=`${chk} / ${tot}`;
-  document.getElementById('prog-fill').style.width=tot?`${(chk/tot)*100}%`:'0%';
-  document.getElementById('unc').textContent=tot-chk;
+  // Progress: only real checkbox items (not freeText/sigma)
+  const checkable=clItems.filter(i=>!i.isSigma&&!i.isFreeText);
+  const answered=checkable.filter(i=>i.answer!==null).length;
+  const tot=checkable.length;
+  const noCount=checkable.filter(i=>i.answer==='no').length;
+  document.getElementById('prog-txt').textContent=`${answered} / ${tot}`;
+  document.getElementById('prog-fill').style.width=tot?`${(answered/tot)*100}%`:'0%';
+  document.getElementById('unc').textContent=noCount;
 
   // Save textarea values before re-render
   const prev={};
   clItems.forEach((_,i)=>{const t=document.getElementById(`ta${i}`);if(t)prev[i]=t.value;});
 
-  // Build HTML with category section headers
   let html='', lastCat='';
   clItems.forEach((item,i)=>{
     const cat=catPrefix(item.idPar);
     const label=catLabel(item.idPar);
-    if(label && cat!==lastCat){
+    if(label&&cat!==lastCat){
       html+=`<div class="cat-header"><span class="cat-label">${esc(label)}</span></div>`;
       lastCat=cat;
     }
 
-    if(item.isSigma || item.isFreeText){
-      // Always-visible textarea — no checkbox
+    if(item.isSigma||item.isFreeText){
+      // Always-visible textarea — no YES/NO
       html+=`
         <div class="ci ci-sigma" id="ci${i}">
           <div class="ci-sigma-label">${esc(item.idPar)} — ${esc(item.onomasia)}</div>
           <div class="ci-cmt-wrap">
-            <textarea id="ta${i}" class="cmt" placeholder="Γράψτε εδώ..." oninput="updCmt(${i},this.value)">${esc(item.sxolia)}</textarea>
+            <textarea id="ta${i}" class="cmt" placeholder="Γράψτε εδώ..." oninput="updCmt(${i},this.value)"></textarea>
           </div>
         </div>`;
     } else {
+      const isYes=item.answer==='yes', isNo=item.answer==='no';
       html+=`
-        <div class="ci ${item.checked?'chk':''}" id="ci${i}">
-          <div class="ci-top" onclick="togChk(${i})">
-            <div class="cbox">${item.checked?'✓':''}</div>
+        <div class="ci ${isYes?'yes-sel':''} ${isNo?'no-sel':''}" id="ci${i}">
+          <div class="ci-top" style="cursor:default">
             <div class="ci-body">
               <div class="ci-name">${esc(item.idPar)} — ${esc(item.onomasia)}</div>
               ${item.logidrio?`<div class="ci-log">${esc(item.logidrio)}</div>`:''}
             </div>
           </div>
-          <div class="ci-cmt-wrap">
-            <textarea id="ta${i}" class="cmt" placeholder="Σχόλια..." oninput="updCmt(${i},this.value)">${esc(item.sxolia)}</textarea>
+          <div class="yn-wrap">
+            <button class="yn-btn ${isYes?'yes-sel':''}" onclick="setAnswer(${i},'yes')">✓ YES</button>
+            <button class="yn-btn ${isNo?'no-sel':''}" onclick="setAnswer(${i},'no')">✗ NO</button>
           </div>
+          ${isNo?`<div class="ci-cmt-wrap">
+            <textarea id="ta${i}" class="cmt" placeholder="Σχόλια..." oninput="updCmt(${i},this.value)"></textarea>
+          </div>`:''}
         </div>`;
     }
   });
   document.getElementById('clist').innerHTML=html;
 
-  // Restore textarea values
+  // Restore textarea values (only for existing textareas after re-render)
   Object.keys(prev).forEach(i=>{
     const t=document.getElementById(`ta${i}`);
     if(t&&prev[i]){t.value=prev[i];clItems[i].sxolia=prev[i];}
   });
 }
 
+function setAnswer(i, val){
+  clItems[i].answer=val;
+  clItems[i].checked=(val==='yes'); // yes=compliant, no=non-compliant
+  if(val==='yes') clItems[i].sxolia=''; // clear comment if switching to yes
+  renderCL();
+  // Restore comment for this item after re-render
+  const ta=document.getElementById(`ta${i}`);
+  if(ta&&clItems[i].sxolia) ta.value=clItems[i].sxolia;
+}
+
 function togChk(i){
-  if(clItems[i].isSigma) return; // Σ δεν κάνει toggle
+  if(clItems[i].isSigma||clItems[i].isFreeText) return;
   const ta=document.getElementById(`ta${i}`);
   if(ta)clItems[i].sxolia=ta.value;
   clItems[i].checked=!clItems[i].checked;
@@ -682,24 +685,33 @@ function togChk(i){
 }
 function updCmt(i,v){
   clItems[i].sxolia=v;
-  const checkable=clItems.filter(x=>!x.isSigma && !x.isFreeText);
-  document.getElementById('unc').textContent=checkable.filter(x=>!x.checked).length;
+  const noCount=clItems.filter(x=>!x.isSigma&&!x.isFreeText&&x.answer==='no').length;
+  document.getElementById('unc').textContent=noCount;
 }
 
 // ── SAVE ──
 function saveResults(){
   clItems.forEach((_,i)=>{const t=document.getElementById(`ta${i}`);if(t)clItems[i].sxolia=t.value;});
 
-  // Unchecked = only real checkbox items not checked
-  const unc = clItems.filter(i=>!i.isSigma && !i.isFreeText && !i.checked);
-  // Free text fields (Πληροφορίες για μένα) — always saved if filled
-  const freeTexts = clItems.filter(i=>i.isFreeText && i.sxolia.trim());
-  // Σημειώσεις — always saved if filled
-  const sigma = clItems.filter(i=>i.isSigma && i.sxolia.trim());
-
-  if(!unc.length && !freeTexts.length && !sigma.length){
-    toast('✅ Όλα συμμορφώθηκαν — τίποτα να αποθηκευτεί!','ok');
+  // Check all non-freeText/sigma items have an answer
+  const checkable=clItems.filter(i=>!i.isSigma&&!i.isFreeText);
+  const unanswered=checkable.filter(i=>i.answer===null);
+  if(unanswered.length){
+    toast(`⚠️ ${unanswered.length} παρατηρήσεις χωρίς απάντηση (YES/NO)!`,'err');
+    // Scroll to first unanswered
+    const el=document.getElementById(`ci${unanswered[0].id}`);
+    if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
     return;
+  }
+
+  const unc=checkable.filter(i=>i.answer==='no'); // NO = μη συμμορφωμένα
+  const freeTexts=clItems.filter(i=>i.isFreeText&&i.sxolia.trim());
+  const sigma=clItems.filter(i=>i.isSigma&&i.sxolia.trim());
+
+  if(!unc.length&&!freeTexts.length&&!sigma.length){
+    toast('✅ Όλα συμμορφώθηκαν — τίποτα να αποθηκευτεί!','ok');
+    // Still go back and mark as saved
+    recordSaved(curRec,[]);renderList();go('s2');return;
   }
 
   const r=curRec, now=new Date();
@@ -720,30 +732,20 @@ function saveResults(){
     '',
   ];
 
-  // Free text fields (Πληροφορίες) — show at top
   if(freeTexts.length){
-    lines.push(`─── ΠΛΗΡΟΦΟΡΙΕΣ ───`);
-    lines.push('');
-    freeTexts.forEach(item=>{
-      lines.push(`${item.onomasia}: ${item.sxolia.trim()}`);
-    });
+    lines.push(`─── ΠΛΗΡΟΦΟΡΙΕΣ ───`,'');
+    freeTexts.forEach(item=>{ lines.push(`${item.onomasia}: ${item.sxolia.trim()}`); });
     lines.push('');
   }
 
-  // Unchecked grouped by category
   if(unc.length){
-    const total = clItems.filter(i=>!i.isSigma && !i.isFreeText).length;
-    lines.push(`─── ΜΗ ΣΥΜΜΟΡΦΩΜΕΝΑ (${unc.length} / ${total}) ───`);
-    lines.push('');
-    let lastCat='';
-    let n=1;
+    const total=checkable.length;
+    lines.push(`─── ΜΗ ΣΥΜΜΟΡΦΩΜΕΝΑ (${unc.length} / ${total}) ───`,'');
+    let lastCat='', n=1;
     unc.forEach(item=>{
       const cat=catPrefix(item.idPar);
       const label=catLabel(item.idPar);
-      if(label && cat!==lastCat){
-        lines.push(`[ ${label.toUpperCase()} ]`);
-        lastCat=cat; n=1;
-      }
+      if(label&&cat!==lastCat){ lines.push(`[ ${label.toUpperCase()} ]`); lastCat=cat; n=1; }
       lines.push(`${n}. ${item.logidrio||item.onomasia}`);
       if(item.sxolia.trim()) lines.push(`Σχόλια: ${item.sxolia.trim()}`);
       lines.push('');
@@ -751,46 +753,34 @@ function saveResults(){
     });
   }
 
-  // Σημειώσεις
   if(sigma.length){
-    lines.push(`─── ΣΗΜΕΙΩΣΕΙΣ ───`);
-    lines.push('');
-    sigma.forEach(item=>{
-      lines.push(`${item.onomasia}: ${item.sxolia.trim()}`);
-      lines.push('');
-    });
+    lines.push(`─── ΣΗΜΕΙΩΣΕΙΣ ───`,'');
+    sigma.forEach(item=>{ lines.push(`${item.onomasia}: ${item.sxolia.trim()}`,''); });
   }
 
-  if(r.paratiriseis){ lines.push(`─── ΠΑΡΑΤΗΡΗΣΕΙΣ ───`); lines.push(r.paratiriseis); }
+  if(r.paratiriseis){ lines.push(`─── ΠΑΡΑΤΗΡΗΣΕΙΣ ───`,r.paratiriseis); }
 
   const content=lines.join('\n');
   const safe=(r.dieuthynsi||'record').replace(/[^α-ωΑ-Ωa-zA-Z0-9]/g,'_').slice(0,40);
   const fname=`${safe}_${ds.replace(/\//g,'-')}.txt`;
-  const btn=document.getElementById('btn-save');
 
-  const doAfterSave = () => {
-    recordSaved(r, unc);
-    renderList();
-  };
-
-  // Τοπικά + αμέσως back στη λίστα
-  dlLocal(content, fname);
+  const doAfterSave=()=>{ recordSaved(r,unc); renderList(); };
+  dlLocal(content,fname);
   doAfterSave();
   go('s2');
 
   if(token){
-    // Drive upload στο background — δεν κρατάει τον χρήστη
     toast('⏳ Ανέβασμα στο Drive...','');
-    saveDrive(content, fname)
-      .then(()=>{ toast('✅ Τοπικά + Drive!','ok'); })
-      .catch(e=>{ console.error(e); toast('💾 Τοπικά (Drive απέτυχε)','err'); });
+    saveDrive(content,fname)
+      .then(()=>toast('✅ Τοπικά + Drive!','ok'))
+      .catch(e=>{console.error(e);toast('💾 Τοπικά (Drive απέτυχε)','err');});
   } else {
     toast('💾 Αποθηκεύτηκε τοπικά','ok');
   }
 }
 
 async function saveDrive(content, fname){
-  const FOLDER_ID = '15tX_L-S4bf6225H_PW07enNefgSG9mZt';
+  const FOLDER_ID = '146BhiY9xPIe_7V7x7LnFh7ocToaspd42';
   const b='-------bnd123';
   const meta=JSON.stringify({ name: fname, mimeType: 'text/plain', parents: [FOLDER_ID] });
   const blob = new Blob([content], {type:'text/plain;charset=utf-8'});
@@ -916,7 +906,7 @@ document.addEventListener('DOMContentLoaded', function(){
       const f = this.files[0];
       if(!f) return;
       toast('⏳ Φόρτωση checklist...','');
-      readFileAs(f, (buf)=>{ parseCL(buf); closeMod(); openCL(); });
+      readFileAs(f, (buf)=>{ parseCL(buf); closeMod(); pickSheetAndOpen(); });
       this.value = '';
     });
   }
