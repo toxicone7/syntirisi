@@ -11,56 +11,56 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;600;700&display=swap');
 :root{
   --bg:#0f1923;--surface:#162030;--surface2:#1e2d3d;--border:#2a3f54;
-  --accent:#00c2ff;--accent2:#ff6b35;--text:#e8f0f7;--muted:#6a8099;
-  --ok:#00e676;--ok-dim:#00e67618;--ok-border:#00e67635;--err:#ff4757;--r:12px;
+  --accent:#4ea8de;--accent2:#e8793f;--text:#e8f0f7;--muted:#6a8099;
+  --ok:#4cc38a;--ok-dim:#4cc38a18;--ok-border:#4cc38a35;--err:#e5534b;--r:6px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body{font-family:'Fira Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 .screen{display:none;min-height:100vh;flex-direction:column}
 .screen.active{display:flex}
 
 /* HEADER */
 .hdr{background:var(--surface);border-bottom:1px solid var(--border);padding:13px 15px;display:flex;align-items:center;gap:11px;position:sticky;top:0;z-index:100}
-.back{width:40px;height:40px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--accent);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.back{width:40px;height:40px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--accent);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
 .back:active{transform:scale(.88)}
 .htitle{font-size:18px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hsub{font-size:13px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-top:2px}
+.hsub{font-size:13px;color:var(--muted);font-family:'Fira Sans',sans-serif;margin-top:2px}
 
 /* SCREEN 1 */
 #s1{align-items:center;justify-content:center;gap:26px;padding:30px 18px;
-  background:radial-gradient(ellipse at 25% 20%,#1a3a5c33 0%,transparent 55%),var(--bg)}
+  background:var(--bg)}
 .logo{text-align:center;display:flex;flex-direction:column;align-items:center;gap:0.1px}
-.logo-icon{width:66px;height:66px;background:linear-gradient(135deg,var(--accent),#0077aa);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 3px;box-shadow:0 0 40px #00c2ff33}
+.logo-icon{width:66px;height:66px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 3px}
 .logo-title{font-size:23px;font-weight:700;letter-spacing:-.5px}
-.logo-sub{font-size:11px;color:var(--muted);margin-top:4px;font-family:'IBM Plex Mono',monospace}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;width:100%;max-width:450px}
+.logo-sub{font-size:11px;color:var(--muted);margin-top:4px;font-family:'Fira Sans',sans-serif}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:22px;width:100%;max-width:450px}
 .card h2{font-size:15px;font-weight:600;margin-bottom:5px}
 .card p{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5}
-.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:100px;font-size:11px;font-family:'IBM Plex Mono',monospace;margin-bottom:13px}
-.pill-ok{background:#00e67611;color:var(--ok);border:1px solid #00e67633}
-.pill-no{background:#ff475711;color:var(--err);border:1px solid #ff475733}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:4px;font-size:11px;font-family:'Fira Sans',sans-serif;margin-bottom:13px}
+.pill-ok{background:#4cc38a11;color:var(--ok);border:1px solid #4cc38a33}
+.pill-no{background:#e5534b11;color:var(--err);border:1px solid #e5534b33}
 .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
-.btn{width:100%;padding:14px;border:none;border-radius:10px;font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn{width:100%;padding:14px;border:none;border-radius:6px;font-family:'Fira Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
 .btn:active{transform:scale(.97)}
 .btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
-.btn-p{background:linear-gradient(135deg,var(--accent),#0099cc);color:#fff}
+.btn-p{background:var(--accent);color:#0b1219}
 .btn-o{background:transparent;border:1px solid var(--border);color:var(--text);font-size:13px;padding:12px;margin-top:9px}
-.btn-save{background:linear-gradient(135deg,var(--accent2),#e05525);color:#fff;font-size:15px;font-weight:700;padding:17px;border-radius:12px;box-shadow:0 4px 20px #ff6b3544}
+.btn-save{background:var(--accent2);color:#0b1219;font-size:15px;font-weight:700;padding:17px;border-radius:6px}
 .divider{display:flex;align-items:center;gap:10px;margin:15px 0}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
-.divider span{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace}
+.divider span{font-size:11px;color:var(--muted);font-family:'Fira Sans',sans-serif}
 
 /* SCREEN 2 */
 #s2{background:var(--bg)}
 .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:9px 13px;display:flex;gap:7px;flex-wrap:wrap;align-items:center}
-.chip{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 11px;font-size:14px;font-family:'IBM Plex Mono',monospace;color:var(--muted)}
+.chip{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 11px;font-size:14px;font-family:'Fira Sans',sans-serif;color:var(--muted)}
 .chip b{color:var(--accent)}
 .chip-ok b{color:var(--ok)}
 .srch-wrap{padding:9px 13px;background:var(--surface);border-bottom:1px solid var(--border)}
-.srch{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:16px;outline:none;transition:border-color .2s}
+.srch{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px 14px;color:var(--text);font-family:'Fira Sans',sans-serif;font-size:16px;outline:none;transition:border-color .2s}
 .srch:focus{border-color:var(--accent)}
 .srch::placeholder{color:var(--muted)}
 .rlist{flex:1;overflow-y:auto;padding:9px 11px;display:flex;flex-direction:column;gap:7px}
@@ -70,12 +70,15 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 .rc:active{background:var(--surface2);transform:scale(.985)}
 /* Record card — saved/done */
 .rc.saved{background:var(--ok-dim);border-color:var(--ok-border)}
-.rc.saved:active{background:#00e67625}
+.rc.saved:active{background:#4cc38a25}
+/* Record card — draft in progress */
+.rc.draft:not(.saved){border-color:#e8793f66}
+.badge-draft{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-family:'Fira Sans',sans-serif;font-weight:600;color:var(--accent2);background:#e8793f18;border:1px solid #e8793f50;border-radius:4px;padding:3px 10px;margin-left:auto}
 
 .rc-r1{display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap}
-.rc-id{font-size:13px;font-family:'IBM Plex Mono',monospace;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:3px 8px}
-.rc-type{font-size:13px;color:var(--accent);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.8px}
-.badge-saved{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--ok);background:#00e67618;border:1px solid #00e67640;border-radius:20px;padding:3px 10px;margin-left:auto}
+.rc-id{font-size:13px;font-family:'Fira Sans',sans-serif;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:3px 8px}
+.rc-type{font-size:13px;color:var(--accent);font-family:'Fira Sans',sans-serif;text-transform:uppercase;letter-spacing:.8px}
+.badge-saved{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-family:'Fira Sans',sans-serif;font-weight:600;color:var(--ok);background:#4cc38a18;border:1px solid #4cc38a40;border-radius:4px;padding:3px 10px;margin-left:auto}
 .rc-addr{font-size:19px;font-weight:600;margin-bottom:5px}
 .rc-ep{font-size:15px;color:var(--muted);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tags{display:flex;gap:6px;flex-wrap:wrap}
@@ -87,46 +90,46 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 /* SCREEN 3 */
 #s3{background:var(--bg)}
 .igrid{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 13px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.igl{font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.7px}
+.igl{font-size:10px;color:var(--muted);font-family:'Fira Sans',sans-serif;text-transform:uppercase;letter-spacing:.7px}
 .igv{font-size:13px;font-weight:600;margin-top:2px}
 .ig-full{grid-column:1/-1}
-.prog-wrap{padding:10px 13px;background:var(--surface);border-bottom:1px solid var(--border)}
+.prog-wrap{padding:10px 13px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:67px;z-index:99}
 .prog-lbl{display:flex;justify-content:space-between;font-size:14px;color:var(--muted);margin-bottom:5px}
 .prog-track{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden}
-.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--ok));border-radius:3px;transition:width .3s}
+.prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
 .clist{flex:1;overflow-y:auto;padding:9px 11px;display:flex;flex-direction:column;gap:5px}
-.ci{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .2s}
-.ci.chk{border-color:#00e67633;background:#00e67605}
+.ci{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;transition:border-color .2s}
+.ci.chk{border-color:#4cc38a33;background:#4cc38a05}
 .ci-top{display:flex;align-items:flex-start;gap:11px;padding:12px;cursor:pointer}
 .cbox{width:26px;height:26px;min-width:26px;border-radius:7px;border:2px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:14px;color:transparent;transition:all .15s;margin-top:1px}
 .ci.chk .cbox{background:var(--ok);border-color:var(--ok);color:#000;font-weight:700}
 .ci-body{flex:1;min-width:0}
-.ci-id{font-size:12px;color:var(--accent2);font-family:'IBM Plex Mono',monospace;font-weight:600;margin-bottom:3px}
+.ci-id{font-size:12px;color:var(--accent2);font-family:'Fira Sans',sans-serif;font-weight:600;margin-bottom:3px}
 .ci-name{font-size:16px;font-weight:600;margin-bottom:4px}
 .ci-log{font-size:14px;color:var(--muted);line-height:1.5}
 .ci.chk .ci-name,.ci.chk .ci-log{opacity:.45;text-decoration:line-through;text-decoration-color:var(--muted)}
 .ci-cmt-wrap{padding:0 12px 12px}
-.cmt{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px 12px;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:15px;outline:none;resize:none;min-height:60px;transition:border-color .2s;display:block}
+.cmt{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px 12px;color:var(--text);font-family:'Fira Sans',sans-serif;font-size:15px;outline:none;resize:none;min-height:60px;transition:border-color .2s;display:block}
 .cmt:focus{border-color:var(--accent)}
 .cmt::placeholder{color:var(--muted)}
 
 /* YES / NO buttons per checklist item */
 .yn-wrap{display:flex;gap:8px;padding:0 12px 12px}
-.yn-btn{flex:1;padding:10px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);color:var(--muted);font-family:'IBM Plex Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.5px}
+.yn-btn{flex:1;padding:10px;border-radius:6px;border:2px solid var(--border);background:var(--surface2);color:var(--muted);font-family:'Fira Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.5px}
 .yn-btn:active{transform:scale(.95)}
-.yn-btn.yes-sel{background:#00e67622;border-color:var(--ok);color:var(--ok)}
-.yn-btn.no-sel{background:#ff475722;border-color:var(--err);color:var(--err)}
-.ci.no-sel{border-color:#ff475744}
-.ci.yes-sel{border-color:#00e67633;background:#00e67605}
+.yn-btn.yes-sel{background:#4cc38a22;border-color:var(--ok);color:var(--ok)}
+.yn-btn.no-sel{background:#e5534b22;border-color:var(--err);color:var(--err)}
+.ci.no-sel{border-color:#e5534b44}
+.ci.yes-sel{border-color:#4cc38a33;background:#4cc38a05}
 .cat-header{padding:14px 12px 6px;display:flex;align-items:center;gap:10px}
 .cat-header::after{content:'';flex:1;height:1px;background:var(--border)}
-.cat-label{font-size:12px;font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;white-space:nowrap}
+.cat-label{font-size:12px;font-family:'Fira Sans',sans-serif;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;white-space:nowrap}
 
 /* Σ — Σημειώσεις item */
-.ci-sigma{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;border-left:3px solid var(--accent)}
+.ci-sigma{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;border-left:3px solid var(--accent)}
 .ci-sigma-label{padding:12px 12px 6px;font-size:15px;font-weight:600;color:var(--text)}
 .save-bar{padding:13px;background:var(--surface);border-top:1px solid var(--border);display:flex;flex-direction:column;gap:7px}
-.save-sum{font-size:12px;color:var(--muted);text-align:center;font-family:'IBM Plex Mono',monospace}
+.save-sum{font-size:12px;color:var(--muted);text-align:center;font-family:'Fira Sans',sans-serif}
 .save-sum b{color:var(--accent2)}
 
 /* SCREEN 4 — HISTORY */
@@ -135,27 +138,28 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 
 .hist-header{background:var(--ok-dim);border:1px solid var(--ok-border);border-radius:var(--r);padding:14px}
 .hist-header-title{font-size:16px;font-weight:700;margin-bottom:3px}
-.hist-header-meta{font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace}
+.hist-header-meta{font-size:12px;color:var(--muted);font-family:'Fira Sans',sans-serif}
 
 .hist-entry{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
 .hist-entry-hdr{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--surface2)}
-.hist-entry-date{font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--accent)}
-.hist-entry-count{font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted)}
+.hist-entry-date{font-size:12px;font-family:'Fira Sans',sans-serif;color:var(--accent)}
+.hist-entry-count{font-size:11px;font-family:'Fira Sans',sans-serif;color:var(--muted)}
 .hist-rows{padding:10px 14px;display:flex;flex-direction:column;gap:8px}
 .hist-row{border-left:2px solid var(--accent2);padding-left:10px}
-.hist-row-id{font-size:10px;color:var(--accent2);font-family:'IBM Plex Mono',monospace;font-weight:600}
+.hist-row-id{font-size:10px;color:var(--accent2);font-family:'Fira Sans',sans-serif;font-weight:600}
 .hist-row-name{font-size:13px;font-weight:600;margin:2px 0}
 .hist-row-log{font-size:12px;color:var(--muted)}
 .hist-row-cmt{font-size:12px;color:var(--text);margin-top:3px;font-style:italic}
 
 .hist-empty{text-align:center;padding:30px 20px;color:var(--muted);font-size:13px}
 
-.btn-danger{background:transparent;border:1px solid #ff475755;color:var(--err);font-size:13px;padding:10px;margin-top:4px}
+.btn-danger{background:transparent;border:1px solid #e5534b55;color:var(--err);font-size:13px;padding:10px;margin-top:4px}
+.btn-edit{padding:16px;font-size:15px;font-weight:700;border-radius:6px}
 
 /* MODAL */
 .mbg{display:none;position:fixed;inset:0;background:#00000099;z-index:500;align-items:center;justify-content:center;padding:18px}
 .mbg.show{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px 20px;width:100%;max-width:370px;text-align:center}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:24px 20px;width:100%;max-width:370px;text-align:center}
 .modal h3{font-size:17px;margin-bottom:8px}
 .modal p{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:20px}
 .mbtns{display:flex;flex-direction:column;gap:8px}
@@ -169,10 +173,10 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 @keyframes sp{to{transform:rotate(360deg)}}
 
 /* TOAST */
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(65px);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:13px;font-weight:500;z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;box-shadow:0 8px 28px #00000066;pointer-events:none}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(65px);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 16px;font-size:13px;font-weight:500;z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;box-shadow:0 2px 8px #00000066;pointer-events:none}
 .toast.show{transform:translateX(-50%) translateY(0)}
-.toast.ok{border-color:#00e67644;color:var(--ok)}
-.toast.err{border-color:#ff475744;color:var(--err)}
+.toast.ok{border-color:#4cc38a44;color:var(--ok)}
+.toast.err{border-color:#e5534b44;color:var(--err)}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 </style>
 </head>
@@ -181,9 +185,8 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 <!-- ══ S1: LOAD ══ -->
 <div id="s1" class="screen active">
   <div class="logo">
-    <img src="logo.png" style="width:166px;height:166px;border-radius:18px;object-fit:contain;display:block;margin-bottom:0;">
+    <img src="logo.png" style="width:166px;height:166px;border-radius:8px;object-fit:contain;display:block;margin-bottom:0;">
     <div class="logo-title">ELEVATOR CHECKLIST</div>
-    <!--<div class="logo-sub">ELEVATOR CHECKLIST</div> -->
   </div>
   <div class="card">
     <div id="auth-pill" class="pill pill-no"><div class="dot"></div> Μη συνδεδεμένο</div>
@@ -220,7 +223,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 <!-- ══ S3: CHECKLIST ══ -->
 <div id="s3" class="screen">
   <div class="hdr">
-    <button class="back" onclick="go('s2')">←</button>
+    <button class="back" onclick="leaveCL()">←</button>
     <div style="flex:1;min-width:0">
       <div class="htitle" id="cl-title">Λίστα Ελέγχου</div>
       <div class="hsub" id="cl-sub">—</div>
@@ -279,16 +282,19 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 // ── CONFIG ──
 const GOOGLE_CLIENT_ID = '390653771880-bqusd1q8pe4a2v970ms5hdhjcgasqlf1.apps.googleusercontent.com';
 const SCOPES = 'https://www.googleapis.com/auth/drive';
-const LS_KEY = 'syntirisi_history'; // localStorage key
+const LS_KEY      = 'syntirisi_history';   // ιστορικό αποθηκεύσεων
+const LS_DRAFTS   = 'syntirisi_drafts';    // πρόχειρα (μισοσυμπληρωμένα checklist)
+const LS_PROG     = 'syntirisi_prog';      // το πρόγραμμα ημέρας (για να μην χάνεται με refresh)
+const LS_CURRENT  = 'syntirisi_current';   // ποιο checklist είναι ανοιχτό αυτή τη στιγμή
 
 // ── STATE ──
 let records=[], filtered=[], clTpl=[], clItems=[], curRec=null, token=null;
 let clSheets={}, clActiveSheet='';
+let pendingPrefill=null; // προσυμπληρωμένες τιμές για το επόμενο openCL()
 
 // ══════════════════════════════════════
 // HISTORY (localStorage)
-// history = { [anelk_key]: { record: {...}, saves: [{date, time, unchecked:[...]}] } }
-// anelk_key = record.anelk or fallback to dieuthynsi+aa
+// history = { [anelk_key]: { record: {...}, saves: [{date, time, sheet, items:[{idPar,answer,sxolia}], unchecked:[...]}] } }
 // ══════════════════════════════════════
 function histKey(r){ return (r.anelk||r.dieuthynsi||r.aa||'').trim(); }
 
@@ -298,13 +304,16 @@ function loadHistory(){
 }
 function saveHistory(h){ localStorage.setItem(LS_KEY, JSON.stringify(h)); }
 
-function recordSaved(r, uncheckedItems){
+function recordSaved(r, uncheckedItems, allItems, sheet){
   const h = loadHistory();
   const k = histKey(r);
   const now = new Date();
   const entry = {
     date: now.toLocaleDateString('el-GR'),
     time: now.toLocaleTimeString('el-GR',{hour:'2-digit',minute:'2-digit'}),
+    sheet: sheet||'',
+    // ΟΛΕΣ οι απαντήσεις — για να μπορεί να ξανανοίξει το checklist προσυμπληρωμένο
+    items: (allItems||[]).map(i=>({ idPar:i.idPar, answer:i.answer, sxolia:i.sxolia||'' })),
     unchecked: uncheckedItems.map(item=>({
       idPar:    item.idPar,
       onomasia: item.onomasia,
@@ -328,13 +337,58 @@ function isRecordSaved(r){
   return !!h[histKey(r)];
 }
 
-function getSaveCount(){
-  const h = loadHistory();
-  return Object.keys(h).length;
+// ══════════════════════════════════════
+// DRAFTS — αυτόματη αποθήκευση προόδου
+// drafts = { [key]: { sheet, ts, items:[{idPar,answer,sxolia}] } }
+// ══════════════════════════════════════
+function loadDrafts(){
+  try{ return JSON.parse(localStorage.getItem(LS_DRAFTS)||'{}'); }
+  catch(e){ return {}; }
+}
+function saveDrafts(d){
+  try{ localStorage.setItem(LS_DRAFTS, JSON.stringify(d)); }catch(e){ console.error(e); }
+}
+function hasDraft(r){ return !!loadDrafts()[histKey(r)]; }
+function clearDraft(r){
+  const d=loadDrafts(); delete d[histKey(r)]; saveDrafts(d);
+}
+function persistDraft(){
+  if(!curRec||!clItems.length) return;
+  const d=loadDrafts();
+  d[histKey(curRec)]={
+    sheet: clActiveSheet,
+    ts: Date.now(),
+    items: clItems.map(i=>({ idPar:i.idPar, answer:i.answer, sxolia:i.sxolia||'' }))
+  };
+  saveDrafts(d);
+}
+
+// Μετατροπή μιας αποθήκευσης του ιστορικού σε "prefill"
+function savePrefill(save){
+  if(save.items) return { sheet:save.sheet||null, items:save.items };
+  // παλιές αποθηκεύσεις (χωρίς πλήρη δεδομένα): ό,τι δεν ήταν στα μη συμμορφωμένα ήταν YES
+  return { sheet:save.sheet||null, legacy:save.unchecked||[] };
+}
+
+function applyPrefill(p){
+  if(!p) return;
+  if(p.items){
+    clItems.forEach((it,i)=>{
+      let s = (p.items[i] && p.items[i].idPar===it.idPar) ? p.items[i] : p.items.find(x=>x.idPar===it.idPar);
+      if(s){ it.answer=s.answer; it.sxolia=s.sxolia||''; it.checked=(s.answer==='yes'); }
+    });
+  } else if(p.legacy){
+    clItems.forEach(it=>{
+      if(it.isSigma||it.isFreeText) return;
+      const u=p.legacy.find(x=>x.idPar===it.idPar);
+      if(u){ it.answer='no'; it.sxolia=u.sxolia||''; }
+      else { it.answer='yes'; it.checked=true; }
+    });
+  }
 }
 
 // ── GOOGLE (New Identity Services + Picker) ──
-let pickerCallback = null; // what to do after auth+pick
+let pickerCallback = null;
 
 function loadScript(src){
   return new Promise((res,rej)=>{
@@ -345,7 +399,6 @@ function loadScript(src){
   });
 }
 
-// Step 1: trigger token request via new GIS, then open picker
 async function signInAndPick(){
   const btn=document.getElementById('btn-drive');
   btn.disabled=true;
@@ -370,12 +423,10 @@ function requestToken(){
       btn.disabled=false; btn.innerHTML='<span>🔗</span> Σύνδεση Google Drive';
       if(resp.error){ toast('❌ Αποτυχία σύνδεσης: '+resp.error,'err'); console.error(resp); return; }
       token = resp.access_token;
-      // Αποθήκευση token — κρατάει μέχρι να κλείσει ο browser
       const expires = Date.now() + (resp.expires_in * 1000);
       sessionStorage.setItem('g_token', token);
       sessionStorage.setItem('g_token_exp', expires);
       setAuthUI(true);
-      // Now load picker and open it
       gapi.load('picker', ()=>{
         if(pickerCallback) openPicker(pickerCallback);
       });
@@ -430,8 +481,6 @@ function readFileAs(file, cb){
   }catch(e){ toast('❌ FileReader σφάλμα','err'); console.error(e); }
 }
 
-// All file input wiring is done in DOMContentLoaded — no inline handlers needed
-
 // ── PARSE PROGRAMMA.XLSX ──
 function parseProg(buf,name){
   try{
@@ -455,10 +504,12 @@ function parseProg(buf,name){
       technikos:    row['Τεχνικός']||'',
       paratiriseis: row['Παρατηρήσεις']||'',
     }));
+    // Αποθήκευση προγράμματος ώστε να επιβιώνει του refresh
+    try{ localStorage.setItem(LS_PROG, JSON.stringify({name:name, records:records})); }catch(e){ console.error(e); }
+    localStorage.removeItem(LS_CURRENT);
     document.getElementById('fname').textContent=name;
     document.getElementById('st-tot').textContent=records.length;
     filtered=[...records];
-    // Φόρτωσε checklist από localStorage αμέσως
     if(!Object.keys(clSheets).length) loadCLFromStorage();
     renderList();go('s2');
     toast(`✅ ${records.length} εγγραφές φορτώθηκαν`,'ok');
@@ -478,7 +529,6 @@ function parseCL(buf){
   }catch(e){toast('❌ Σφάλμα checklist','err');console.error(e);}
 }
 
-// Φόρτωση checklist από localStorage αν υπάρχει
 function loadCLFromStorage(){
   try{
     const saved=localStorage.getItem('syntirisi_checklist');
@@ -492,6 +542,10 @@ function loadCLFromStorage(){
 }
 
 function pickSheetAndOpen(){
+  // Αν έχουμε prefill με γνωστό φύλλο → μην ρωτήσεις ξανά
+  if(pendingPrefill && pendingPrefill.sheet && clSheets[pendingPrefill.sheet]){
+    clActiveSheet=pendingPrefill.sheet; clTpl=clSheets[clActiveSheet]; openCL(); return;
+  }
   const names=Object.keys(clSheets);
   if(names.length===1){
     clActiveSheet=names[0]; clTpl=clSheets[clActiveSheet]; openCL(); return;
@@ -520,17 +574,20 @@ function renderList(){
     el.innerHTML=`<div class="empty"><div class="ei">🔍</div><h3>Δεν βρέθηκαν εγγραφές</h3><p>Δοκιμάστε άλλη αναζήτηση</p></div>`;
     return;
   }
+  const h=loadHistory();
+  const drafts=loadDrafts();
   el.innerHTML=filtered.map(r=>{
-    const saved=isRecordSaved(r);
-    const h=loadHistory();
-    const hData=saved?h[histKey(r)]:null;
+    const k=histKey(r);
+    const saved=!!h[k];
+    const draft=!!drafts[k];
+    const hData=saved?h[k]:null;
     const lastSave=hData?hData.saves[0]:null;
     return `
-    <div class="rc${saved?' saved':''}" onclick="tapRec(${r.idx})">
+    <div class="rc${saved?' saved':''}${draft?' draft':''}" onclick="tapRec(${r.idx})">
       <div class="rc-r1">
         <span class="rc-id">#${esc(r.aa)}</span>
         <span class="rc-type">${esc(r.proeleusi)} · ${esc(r.typos)}</span>
-        ${saved?`<span class="badge-saved">✓ ΑΠΟΘΗΚΕΥΤΗΚΕ</span>`:''}
+        ${saved?`<span class="badge-saved">✓ ΑΠΟΘΗΚΕΥΤΗΚΕ</span>`:(draft?`<span class="badge-draft">✏️ ΣΕ ΕΞΕΛΙΞΗ</span>`:'')}
       </div>
       <div class="rc-addr">${esc(r.dieuthynsi)||'(χωρίς διεύθυνση)'}</div>
       ${r.eponymia?`<div class="rc-ep">${esc(r.eponymia)}</div>`:''}
@@ -540,7 +597,7 @@ function renderList(){
         ${r.technikos?`<span class="tag">👤 ${esc(r.technikos)}</span>`:''}
         ${r.anelk?`<span class="tag">🛗 ${esc(r.anelk)}</span>`:''}
       </div>
-      ${saved&&lastSave?`<div class="rc-saved-info">✅ Τελευταία αποθήκευση: ${lastSave.date} ${lastSave.time} · ${lastSave.unchecked.length} μη συμμ.</div>`:''}
+      ${saved&&lastSave?`<div class="rc-saved-info">✅ Τελευταία αποθήκευση: ${lastSave.date} ${lastSave.time} · ${lastSave.unchecked.length} μη συμμ.${draft?' · ✏️ ανοιχτή επεξεργασία':''}</div>`:''}
       ${!saved&&r.paratiriseis?`<div class="rc-note">${esc(r.paratiriseis)}</div>`:''}
       <div class="rc-arr">›</div>
     </div>`}).join('');
@@ -553,28 +610,46 @@ function filterList(){
 }
 
 // ── TAP RECORD ──
-// If saved → go to history. If not saved → go to checklist.
+// Saved → ιστορικό. Not saved → checklist (με πρόχειρο αν υπάρχει).
 function tapRec(idx){
   curRec=records[idx];
   if(isRecordSaved(curRec)){
     openHistory(curRec);
   } else {
-    if(!Object.keys(clSheets).length) loadCLFromStorage();
-    if(Object.keys(clSheets).length){ pickSheetAndOpen(); }
-    else { document.getElementById('cl-modal').classList.add('show'); }
+    const d=loadDrafts()[histKey(curRec)];
+    startCL(d||null);
   }
 }
 
+// Ξεκινά το checklist για το curRec, προσυμπληρωμένο αν δοθεί prefill
+function startCL(prefill){
+  pendingPrefill=prefill||null;
+  if(!Object.keys(clSheets).length) loadCLFromStorage();
+  if(Object.keys(clSheets).length){ pickSheetAndOpen(); }
+  else { document.getElementById('cl-modal').classList.add('show'); }
+}
+
+// Κουμπί "Επεξεργασία" από την οθόνη ιστορικού
+function editRecord(){
+  if(!curRec) return;
+  const k=histKey(curRec);
+  const d=loadDrafts()[k];
+  if(d){ startCL(d); return; }
+  const hData=loadHistory()[k];
+  if(!hData||!hData.saves.length){ startCL(null); return; }
+  startCL(savePrefill(hData.saves[0]));
+}
+
 // ── OPEN CHECKLIST ──
-// Category prefix map
 const CAT_LABELS = { 'Μ':'Μηχανοστάσιο', 'Θ':'Θάλαμος', 'Φ':'Φρεάτιο', 'Τ':'Τεχνικός Φάκελος', 'Σ':'Σημειώσεις' };
 function catPrefix(idPar){ return (idPar||'').charAt(0).toUpperCase(); }
 function catLabel(idPar){ return CAT_LABELS[catPrefix(idPar)] || ''; }
 
 function openCL(){
   const r=curRec;
+  const prefill=pendingPrefill; pendingPrefill=null;
   document.getElementById('cl-title').textContent=r.dieuthynsi||'Λίστα Ελέγχου';
-  document.getElementById('cl-sub').textContent=`${clActiveSheet||r.typos} · ${r.periochi}`;
+  document.getElementById('cl-sub').textContent=`${clActiveSheet||r.typos} · ${r.periochi}${isRecordSaved(r)?' · ✏️ Επεξεργασία':''}`;
   document.getElementById('igrid').innerHTML=`
     <div><div class="igl">Διεύθυνση</div><div class="igv">${esc(r.dieuthynsi)}</div></div>
     <div><div class="igl">Περιοχή / ΤΚ</div><div class="igv">${esc(r.periochi)} ${esc(r.tk)}</div></div>
@@ -583,7 +658,6 @@ function openCL(){
     <div class="ig-full"><div class="igl">Ανελκυστήρας</div><div class="igv">${esc(r.anelk)} · ${esc(r.eponymia)}</div></div>
     ${r.paratiriseis?`<div class="ig-full"><div class="igl">Παρατηρήσεις</div><div class="igv" style="font-size:14px;font-weight:400;color:var(--muted)">${esc(r.paratiriseis)}</div></div>`:''}
   `;
-  // ── FIX #2: always build fresh items — never carry over previous record's data ──
   clItems=clTpl.map((row,i)=>{
     const logidrio=row['ΛΟΓΙΔΡΙΟ']||'';
     const isFreeText=logidrio.includes('Πληροφορίες για μένα')||logidrio.includes('Free text');
@@ -593,20 +667,32 @@ function openCL(){
       idPar:    row['ID ΠΑΡΑΤΗΡΗΣΗΣ']||'',
       onomasia: row['CHECKLIST ΟΝΟΜΑΣΙΑ']||'',
       logidrio: logidrio,
-      sxolia:   '', // ← always empty on new record
+      sxolia:   '',
       isFreeText: isFreeText,
       isSigma:  isSigma,
-      answer:   null, // null=unanswered, 'yes', 'no' — for YES/NO items
-      checked:  false // kept for compatibility
+      answer:   null,
+      checked:  false
     };
   });
-  // Clear the checklist DOM immediately to prevent any stale values showing
+  // Προσυμπλήρωση (πρόχειρο ή προηγούμενη αποθήκευση)
+  applyPrefill(prefill);
+  // Θυμήσου ποιο checklist είναι ανοιχτό (για refresh)
+  try{ localStorage.setItem(LS_CURRENT, JSON.stringify({idx:r.idx})); }catch(e){}
   document.getElementById('clist').innerHTML='';
   renderCL();go('s3');
+  // Η μπάρα προόδου μένει σταθερή ακριβώς κάτω από την κεφαλίδα
+  const hh=document.querySelector('#s3 .hdr').offsetHeight;
+  document.querySelector('#s3 .prog-wrap').style.top=hh+'px';
+  if(prefill) toast('📋 Φορτώθηκαν οι προηγούμενες απαντήσεις','ok');
+}
+
+function leaveCL(){
+  localStorage.removeItem(LS_CURRENT);
+  renderList();
+  go('s2');
 }
 
 function renderCL(){
-  // Progress: only real checkbox items (not freeText/sigma)
   const checkable=clItems.filter(i=>!i.isSigma&&!i.isFreeText);
   const answered=checkable.filter(i=>i.answer!==null).length;
   const tot=checkable.length;
@@ -614,10 +700,6 @@ function renderCL(){
   document.getElementById('prog-txt').textContent=`${answered} / ${tot}`;
   document.getElementById('prog-fill').style.width=tot?`${(answered/tot)*100}%`:'0%';
   document.getElementById('unc').textContent=noCount;
-
-  // Save textarea values before re-render
-  const prev={};
-  clItems.forEach((_,i)=>{const t=document.getElementById(`ta${i}`);if(t)prev[i]=t.value;});
 
   let html='', lastCat='';
   clItems.forEach((item,i)=>{
@@ -629,12 +711,11 @@ function renderCL(){
     }
 
     if(item.isSigma||item.isFreeText){
-      // Always-visible textarea — no YES/NO
       html+=`
         <div class="ci ci-sigma" id="ci${i}">
           <div class="ci-sigma-label">${esc(item.idPar)} — ${esc(item.onomasia)}</div>
           <div class="ci-cmt-wrap">
-            <textarea id="ta${i}" class="cmt" placeholder="Γράψτε εδώ..." oninput="updCmt(${i},this.value)"></textarea>
+            <textarea id="ta${i}" class="cmt" placeholder="Γράψτε εδώ..." oninput="updCmt(${i},this.value)">${esc(item.sxolia)}</textarea>
           </div>
         </div>`;
     } else {
@@ -652,66 +733,58 @@ function renderCL(){
             <button class="yn-btn ${isNo?'no-sel':''}" onclick="setAnswer(${i},'no')">✗ NO</button>
           </div>
           ${isNo?`<div class="ci-cmt-wrap">
-            <textarea id="ta${i}" class="cmt" placeholder="Σχόλια..." oninput="updCmt(${i},this.value)"></textarea>
+            <textarea id="ta${i}" class="cmt" placeholder="Σχόλια..." oninput="updCmt(${i},this.value)">${esc(item.sxolia)}</textarea>
           </div>`:''}
         </div>`;
     }
   });
-  document.getElementById('clist').innerHTML=html;
-
-  // Restore textarea values (only for existing textareas after re-render)
-  Object.keys(prev).forEach(i=>{
-    const t=document.getElementById(`ta${i}`);
-    if(t&&prev[i]){t.value=prev[i];clItems[i].sxolia=prev[i];}
-  });
+  const list=document.getElementById('clist');
+  const scrollTop=list.scrollTop;
+  list.innerHTML=html;
+  list.scrollTop=scrollTop;
 }
 
 function setAnswer(i, val){
   clItems[i].answer=val;
-  clItems[i].checked=(val==='yes'); // yes=compliant, no=non-compliant
-  if(val==='yes') clItems[i].sxolia=''; // clear comment if switching to yes
+  clItems[i].checked=(val==='yes');
+  if(val==='yes') clItems[i].sxolia='';
   renderCL();
-  // Restore comment for this item after re-render
-  const ta=document.getElementById(`ta${i}`);
-  if(ta&&clItems[i].sxolia) ta.value=clItems[i].sxolia;
+  persistDraft();
 }
 
-function togChk(i){
-  if(clItems[i].isSigma||clItems[i].isFreeText) return;
-  const ta=document.getElementById(`ta${i}`);
-  if(ta)clItems[i].sxolia=ta.value;
-  clItems[i].checked=!clItems[i].checked;
-  renderCL();
-}
 function updCmt(i,v){
   clItems[i].sxolia=v;
   const noCount=clItems.filter(x=>!x.isSigma&&!x.isFreeText&&x.answer==='no').length;
   document.getElementById('unc').textContent=noCount;
+  persistDraft();
 }
 
 // ── SAVE ──
 function saveResults(){
   clItems.forEach((_,i)=>{const t=document.getElementById(`ta${i}`);if(t)clItems[i].sxolia=t.value;});
 
-  // Check all non-freeText/sigma items have an answer
   const checkable=clItems.filter(i=>!i.isSigma&&!i.isFreeText);
   const unanswered=checkable.filter(i=>i.answer===null);
   if(unanswered.length){
     toast(`⚠️ ${unanswered.length} παρατηρήσεις χωρίς απάντηση (YES/NO)!`,'err');
-    // Scroll to first unanswered
     const el=document.getElementById(`ci${unanswered[0].id}`);
     if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
     return;
   }
 
-  const unc=checkable.filter(i=>i.answer==='no'); // NO = μη συμμορφωμένα
+  const unc=checkable.filter(i=>i.answer==='no');
   const freeTexts=clItems.filter(i=>i.isFreeText&&i.sxolia.trim());
   const sigma=clItems.filter(i=>i.isSigma&&i.sxolia.trim());
 
+  const finish=()=>{
+    recordSaved(curRec,unc,clItems,clActiveSheet);
+    clearDraft(curRec);
+    localStorage.removeItem(LS_CURRENT);
+  };
+
   if(!unc.length&&!freeTexts.length&&!sigma.length){
     toast('✅ Όλα συμμορφώθηκαν — τίποτα να αποθηκευτεί!','ok');
-    // Still go back and mark as saved
-    recordSaved(curRec,[]);renderList();go('s2');return;
+    finish();renderList();go('s2');return;
   }
 
   const r=curRec, now=new Date();
@@ -764,9 +837,9 @@ function saveResults(){
   const safe=(r.dieuthynsi||'record').replace(/[^α-ωΑ-Ωa-zA-Z0-9]/g,'_').slice(0,40);
   const fname=`${safe}_${ds.replace(/\//g,'-')}.txt`;
 
-  const doAfterSave=()=>{ recordSaved(r,unc); renderList(); };
   dlLocal(content,fname);
-  doAfterSave();
+  finish();
+  renderList();
   go('s2');
 
   if(token){
@@ -781,11 +854,9 @@ function saveResults(){
 
 async function saveDrive(content, fname){
   const FOLDER_ID = '146BhiY9xPIe_7V7x7LnFh7ocToaspd42';
-  const b='-------bnd123';
   const meta=JSON.stringify({ name: fname, mimeType: 'text/plain', parents: [FOLDER_ID] });
   const blob = new Blob([content], {type:'text/plain;charset=utf-8'});
 
-  // Χρήση FormData για σωστό multipart με parents
   const form = new FormData();
   form.append('metadata', new Blob([meta], {type:'application/json'}));
   form.append('file', blob);
@@ -822,12 +893,15 @@ function openHistory(r){
   }
 
   const saves=hData.saves;
+  const draft=hasDraft(r);
   el.innerHTML=`
     <div class="hist-header">
       <div class="hist-header-title">🛗 ${esc(r.dieuthynsi)}</div>
       <div class="hist-header-meta">${esc(r.anelk)} · ${esc(r.eponymia)} · ${esc(r.technikos)}</div>
       <div class="hist-header-meta" style="margin-top:4px">${saves.length} αποθήκευση/εις · ${saves[0].date} τελευταία</div>
     </div>
+
+    <button class="btn btn-p btn-edit" onclick="editRecord()">${draft?'✏️ Συνέχεια επεξεργασίας':'✏️ Επεξεργασία checklist'}</button>
 
     ${saves.map((s,si)=>`
       <div class="hist-entry">
@@ -860,6 +934,7 @@ function clearHistory(key){
   const h=loadHistory();
   delete h[key];
   saveHistory(h);
+  const d=loadDrafts(); delete d[key]; saveDrafts(d);
   renderList();
   go('s2');
   toast('🗑 Ιστορικό διαγράφηκε','ok');
@@ -872,7 +947,7 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 let _tt;
 function toast(msg,type){const e=document.getElementById('toast');e.textContent=msg;e.className=`toast show ${type}`;clearTimeout(_tt);_tt=setTimeout(()=>e.classList.remove('show'),3200);}
 
-// ── INIT: wire up all buttons and file inputs after DOM ready ──
+// ── INIT ──
 document.addEventListener('DOMContentLoaded', function(){
 
   // Επαναφορά token από sessionStorage αν δεν έχει λήξει
@@ -880,10 +955,9 @@ document.addEventListener('DOMContentLoaded', function(){
   const savedExp   = parseInt(sessionStorage.getItem('g_token_exp')||'0');
   if(savedToken && Date.now() < savedExp - 60000){
     token = savedToken;
-    setAuthUI(false); // δείξε "Συνδεδεμένο" χωρίς toast
+    setAuthUI(false);
   }
 
-  // Main programme file — button triggers hidden input
   const btnLocalProg = document.getElementById('btn-local-prog');
   const inputProg    = document.getElementById('lf-prog');
   if(btnLocalProg && inputProg){
@@ -893,11 +967,10 @@ document.addEventListener('DOMContentLoaded', function(){
       if(!f){ toast('Δεν επιλέχτηκε αρχείο','err'); return; }
       toast('⏳ Φόρτωση προγράμματος...','');
       readFileAs(f, (buf, name)=>parseProg(buf, name));
-      this.value = ''; // reset so same file triggers again next time
+      this.value = '';
     });
   }
 
-  // Checklist file
   const btnLocalCL = document.getElementById('btn-local-cl');
   const inputCL    = document.getElementById('lf-cl');
   if(btnLocalCL && inputCL){
@@ -911,6 +984,28 @@ document.addEventListener('DOMContentLoaded', function(){
     });
   }
 
+  // ── Επαναφορά μετά από refresh: πρόγραμμα + ανοιχτό checklist ──
+  try{
+    const prog = JSON.parse(localStorage.getItem(LS_PROG)||'null');
+    if(prog && Array.isArray(prog.records) && prog.records.length){
+      records = prog.records;
+      filtered = [...records];
+      document.getElementById('fname').textContent = prog.name||'—';
+      document.getElementById('st-tot').textContent = records.length;
+      loadCLFromStorage();
+      renderList();
+      go('s2');
+
+      const cur = JSON.parse(localStorage.getItem(LS_CURRENT)||'null');
+      if(cur && records[cur.idx]){
+        curRec = records[cur.idx];
+        const k = histKey(curRec);
+        let pre = loadDrafts()[k] || null;
+        if(!pre && isRecordSaved(curRec)) pre = savePrefill(loadHistory()[k].saves[0]);
+        startCL(pre);
+      }
+    }
+  }catch(e){ console.error('Restore failed', e); }
 });
 </script>
 </body>
