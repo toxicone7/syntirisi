@@ -13,7 +13,7 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;600;700&display=swap');
 :root{
-  --bg:#0f1923;--surface:#162030;--surface2:#1e2d3d;--border:#2a3f54;
+  --bg:#0f1923;--bg2:#052939;--surface:#162030;--surface2:#1e2d3d;--border:#2a3f54;
   --accent:#4ea8de;--accent2:#e8793f;--text:#e8f0f7;--muted:#6a8099;
   --ok:#4cc38a;--ok-dim:#4cc38a18;--ok-border:#4cc38a35;--err:#e5534b;--r:6px;
 }
@@ -31,7 +31,7 @@ body{font-family:'Fira Sans',sans-serif;background:var(--bg);color:var(--text);m
 
 /* SCREEN 1 */
 #s1{align-items:center;justify-content:center;gap:26px;padding:30px 18px;
-  background:var(--bg)}
+  background:var(--bg2)}
 .logo{text-align:center;display:flex;flex-direction:column;align-items:center;gap:0.1px}
 .logo-icon{width:66px;height:66px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 3px}
 .logo-title{font-size:23px;font-weight:700;letter-spacing:-.5px}
@@ -98,6 +98,8 @@ body{font-family:'Fira Sans',sans-serif;background:var(--bg);color:var(--text);m
 .prog-track{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden}
 .prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
 .clist{flex:1;overflow-y:auto;padding:9px 11px;display:flex;flex-direction:column;gap:5px}
+/* Το overflow:visible χρειάζεται για να δουλεύει το sticky στα cat-header */
+#s3 .clist{overflow:visible}
 .ci{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;transition:border-color .2s}
 .ci.chk{border-color:#4cc38a33;background:#4cc38a05}
 .ci-top{display:flex;align-items:flex-start;gap:11px;padding:12px;cursor:pointer}
@@ -121,9 +123,18 @@ body{font-family:'Fira Sans',sans-serif;background:var(--bg);color:var(--text);m
 .yn-btn.no-sel{background:#e5534b22;border-color:var(--err);color:var(--err)}
 .ci.no-sel{border-color:#e5534b44}
 .ci.yes-sel{border-color:#4cc38a33;background:#4cc38a05}
-.cat-header{padding:14px 12px 6px;display:flex;align-items:center;gap:10px}
-.cat-header::after{content:'';flex:1;height:1px;background:var(--border)}
-.cat-label{font-size:12px;font-family:'Fira Sans',sans-serif;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;white-space:nowrap}
+
+/* Κατηγορίες (Μηχανοστάσιο, Θάλαμος...) — έντονες και κολλητές (sticky) */
+.cat-header{
+  margin:10px -11px 4px;padding:11px 14px;
+  display:flex;align-items:center;gap:10px;
+  background:#1d3b57;
+  border-left:6px solid var(--accent2);
+  border-top:1px solid var(--accent);border-bottom:1px solid var(--accent);
+  position:sticky;top:var(--stick-top,130px);z-index:98;
+  box-shadow:0 3px 8px #00000066;
+}
+.cat-label{font-size:17px;font-family:'Fira Sans',sans-serif;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:2px;white-space:nowrap}
 
 /* Σ — Σημειώσεις item */
 .ci-sigma{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;border-left:3px solid var(--accent)}
@@ -680,9 +691,12 @@ function openCL(){
   try{ localStorage.setItem(LS_CURRENT, JSON.stringify({idx:r.idx})); }catch(e){}
   document.getElementById('clist').innerHTML='';
   renderCL();go('s3');
-  // Η μπάρα προόδου μένει σταθερή ακριβώς κάτω από την κεφαλίδα
+  // Η μπάρα προόδου μένει σταθερή ακριβώς κάτω από την κεφαλίδα,
+  // και τα cat-header κολλάνε ακριβώς κάτω από τη μπάρα προόδου
   const hh=document.querySelector('#s3 .hdr').offsetHeight;
-  document.querySelector('#s3 .prog-wrap').style.top=hh+'px';
+  const pw=document.querySelector('#s3 .prog-wrap');
+  pw.style.top=hh+'px';
+  document.documentElement.style.setProperty('--stick-top',(hh+pw.offsetHeight)+'px');
   if(prefill) toast('📋 Φορτώθηκαν οι προηγούμενες απαντήσεις','ok');
 }
 
