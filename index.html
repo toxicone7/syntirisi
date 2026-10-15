@@ -196,7 +196,7 @@ body{font-family:'Fira Sans',sans-serif;background:var(--bg);color:var(--text);m
 <!-- ══ S1: LOAD ══ -->
 <div id="s1" class="screen active">
   <div class="logo">
-    <img src="logo.png" style="width:166px;height:166px;border-radius:8px;object-fit:contain;display:block;margin-bottom:0;">
+    <img src="logo.png" style="width:min(498px,92vw);height:min(498px,92vw);border-radius:8px;object-fit:contain;display:block;margin-bottom:0;">
     <div class="logo-title">ELEVATOR CHECKLIST</div>
   </div>
   <div class="card">
@@ -239,6 +239,7 @@ body{font-family:'Fira Sans',sans-serif;background:var(--bg);color:var(--text);m
       <div class="htitle" id="cl-title">Λίστα Ελέγχου</div>
       <div class="hsub" id="cl-sub">—</div>
     </div>
+    <button class="btn btn-o" style="width:auto;padding:8px 12px;font-size:13px;margin:0;flex-shrink:0" onclick="changeTypeFromCL()">🔄 Τύπος</button>
   </div>
   <div class="igrid" id="igrid"></div>
   <div class="prog-wrap">
@@ -552,9 +553,10 @@ function loadCLFromStorage(){
   return false;
 }
 
-function pickSheetAndOpen(){
-  // Αν έχουμε prefill με γνωστό φύλλο → μην ρωτήσεις ξανά
-  if(pendingPrefill && pendingPrefill.sheet && clSheets[pendingPrefill.sheet]){
+// force=true → ρωτάει πάντα για τύπο (χρησιμοποιείται από το κουμπί "Αλλαγή τύπου")
+function pickSheetAndOpen(force){
+  // Αν δεν είναι "αλλαγή τύπου" και έχουμε prefill με γνωστό φύλλο → μην ρωτήσεις ξανά
+  if(!force && pendingPrefill && pendingPrefill.sheet && clSheets[pendingPrefill.sheet]){
     clActiveSheet=pendingPrefill.sheet; clTpl=clSheets[clActiveSheet]; openCL(); return;
   }
   const names=Object.keys(clSheets);
@@ -572,7 +574,35 @@ function selectSheet(name){
   document.getElementById('sheet-modal').classList.remove('show');
   openCL();
 }
-function closeSheetModal(){ document.getElementById('sheet-modal').classList.remove('show'); }
+function closeSheetModal(){
+  document.getElementById('sheet-modal').classList.remove('show');
+  pendingPrefill=null; // ακύρωση αλλαγής τύπου
+}
+
+// Αλλαγή τύπου από την οθόνη ιστορικού (πριν μπεις στον ανελκυστήρα)
+function changeTypeFromHistory(){
+  if(!curRec) return;
+  const k=histKey(curRec);
+  let p=loadDrafts()[k];
+  if(!p){
+    const hd=loadHistory()[k];
+    p=(hd&&hd.saves.length)?savePrefill(hd.saves[0]):null;
+  }
+  pendingPrefill=p?{...p,sheet:null}:null;   // sheet:null → θα ρωτήσει
+  if(!Object.keys(clSheets).length) loadCLFromStorage();
+  if(Object.keys(clSheets).length) pickSheetAndOpen(true);
+  else document.getElementById('cl-modal').classList.add('show');
+}
+
+// Αλλαγή τύπου μέσα από το ανοιχτό checklist
+function changeTypeFromCL(){
+  clItems.forEach((_,i)=>{const t=document.getElementById('ta'+i); if(t) clItems[i].sxolia=t.value;});
+  pendingPrefill={
+    sheet:null,
+    items:clItems.map(i=>({idPar:i.idPar,answer:i.answer,sxolia:i.sxolia||''}))
+  };
+  pickSheetAndOpen(true);
+}
 
 // ── RENDER LIST ──
 function renderList(){
@@ -691,6 +721,8 @@ function openCL(){
   try{ localStorage.setItem(LS_CURRENT, JSON.stringify({idx:r.idx})); }catch(e){}
   document.getElementById('clist').innerHTML='';
   renderCL();go('s3');
+  // Αν άλλαξε ο τύπος, ενημέρωσε το πρόχειρο ώστε να θυμάται το νέο φύλλο
+  if(prefill) persistDraft();
   // Η μπάρα προόδου μένει σταθερή ακριβώς κάτω από την κεφαλίδα,
   // και τα cat-header κολλάνε ακριβώς κάτω από τη μπάρα προόδου
   const hh=document.querySelector('#s3 .hdr').offsetHeight;
@@ -916,6 +948,7 @@ function openHistory(r){
     </div>
 
     <button class="btn btn-p btn-edit" onclick="editRecord()">${draft?'✏️ Συνέχεια επεξεργασίας':'✏️ Επεξεργασία Επιθεώρησης'}</button>
+    <button class="btn btn-o" style="margin-top:0" onclick="changeTypeFromHistory()">🔄 Αλλαγή τύπου</button>
 
     ${saves.map((s,si)=>`
       <div class="hist-entry">
